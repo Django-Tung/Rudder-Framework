@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    /* 语言与运行环境 */
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "useDefineForClassFields": true,
+
+    /* 类型约束（Rudder 策略：禁止 any，严格模式） */
+    "strict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    /* 模块互操作 */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+
+    /* 本工程只做类型检查，产物交给 Vite */
+    "noEmit": true,
+    "skipLibCheck": true,
+
+    /* 路径别名：@/* -> src/*，需与 vite.config.ts 的 resolve.alias 保持一致。
+       不使用 baseUrl（TypeScript 7.0 起已弃用）；省略后 paths 以本文件所在目录为基准解析。 */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    "types": ["vite/client", "node"]
+  },
+  "include": ["src", "vite.config.ts"]
+}

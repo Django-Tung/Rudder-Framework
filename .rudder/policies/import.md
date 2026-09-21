@@ -30,7 +30,7 @@
 
 ## 5. 作用域与隔离
 
-- `plan.md` §六.1 的"仅允许读取 MASTER-PRD.md 与当前 REQ 目录"约束，**仅作用于 Plan→Commit 窗口**。
+- `docs/rudder-os-upgrade-guide.md` §六.1 的"仅允许读取 MASTER-PRD.md 与当前 REQ 目录"约束，**仅作用于 Plan→Commit 窗口**。
 - **导入阶段例外**：须同时读外部待导入文档与 `MASTER-PRD.md` 才能判定全局/局部。
 
 ## 6. 输出约定

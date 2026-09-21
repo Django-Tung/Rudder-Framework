@@ -3,131 +3,74 @@ id: REQ-XXX
 name: [中文需求名称]
 status: DRAFT
 phase: plan
-created: [YYYY-MM-DD]
+created: YYYY-MM-DD
 ---
 
-# Requirement: [中文需求名称]
+# 📋 需求规划 (PRD): <需求简短名称>
 
-> 本文件是需求的唯一真相源。`implement.md` 依此实施，`verify.md` 依此验证，`review.md` 依此逐条核对。
-> 编写要求：所有正文、用户故事、验收标准、界面文案一律使用**简体中文**；代码、类型名、文件路径保持英文。
+> ⚠️ **AI 阅读指南**：本文档是后续 Implement/Verify/Review 的唯一事实来源 (Single Source of Truth)。在编码前，必须确保所有带 `[ ]` 的待澄清问题已解决，且所有技术契约已明确。
 
-## 1. 目标 (Goal)
+## 1. 业务背景与目标 (Context & Goals)
+- **业务背景**：[简述为什么要做这个功能，解决什么痛点]
+- **核心目标**：[用 1-2 句话描述最终交付物的核心价值]
+- **非目标 (Non-Goals)**：[明确列出本次需求**绝对不做**的事情，防止 AI 过度设计]
 
-[一句话描述业务目标与它为用户带来的价值。不要写实现方式。]
+## 2. 用户故事与场景 (User Stories & Scenarios)
+- **核心角色**：[如：未登录用户、系统管理员]
+- **故事 1**：作为 [角色]，我想要 [执行某操作]，以便于 [达成某目的]。
+  - **场景 A (正常流)**：...
+  - **场景 B (异常流/边缘情况)**：...
 
-## 2. 范围 (Scope)
+## 3. 验收标准 (BDD Acceptance Criteria)
+> 必须使用 Given-When-Then 格式，这是 Verify 阶段自动化测试和 Review 阶段人工核对的唯一基准。
 
-### In Scope（本次要做）
-- [ ] 功能点 1
-- [ ] 功能点 2
+- **AC-1: [功能点名称]**
+  - **Given** [前置条件，如：用户处于登录页且网络正常]
+  - **When** [用户操作，如：输入正确的邮箱和密码并点击登录]
+  - **Then** [预期结果，如：按钮显示 Loading 状态，300ms 后跳转至首页]
+- **AC-2: [异常处理名称]**
+  - **Given** [前置条件，如：用户处于登录页且后端返回 500 错误]
+  - **When** [用户操作，如：点击登录]
+  - **Then** [预期结果，如：按钮恢复可用，页面顶部弹出中文错误提示“服务器开小差了，请稍后再试”]
 
-### Non-goals（本次明确不做）
-- [ ] 明确排除项 1
+## 4. UI/UX 与状态规范 (UI/UX & State Specifications)
+> 🚨 **Rudder-OS 强制约束**：AI 必须处理以下所有 UI 状态，且所有面向用户的文案**必须为简体中文**。
 
-> ⚠️ Non-goals 是防范围蔓延的硬边界。`review.md` 的「范围合规」会逐条核对此处。
+- **Loading 状态**：[描述加载时的 UI 表现，如：骨架屏 / 按钮 Spin / 全局遮罩]
+- **Empty 状态**：[描述无数据时的 UI 表现及引导文案]
+- **Error 状态**：[描述请求失败或表单校验失败时的 UI 表现及中文提示文案]
+- **Success/Default 状态**：[描述正常渲染的 UI 布局]
+- **响应式要求**：[如：移动端优先，断点设置在 768px]
 
-## 3. 用户故事 (User Stories)
+## 5. 技术契约与数据模型 (Technical Contract & Data Models)
+> 🚨 **Rudder-OS 强制约束**：严格遵守技术栈 (React 19 + TS strict + Tailwind v4 + Zustand)。禁止引入未授权的第三方 UI 库。
 
-| 编号 | 作为… | 我想要… | 以便于… |
-|------|-------|---------|---------|
-| US-1 | [角色] | [诉求] | [价值] |
-| US-2 | [角色] | [诉求] | [价值] |
-
-## 4. 验收标准 (Acceptance Criteria)
-
-> 采用 BDD（Given / When / Then）格式，每条必须可被明确判定「通过 / 失败」。
-> **本节的 AC 编号将直接对应 `review.md`「需求符合度」表格中的行，编号不得随意变更。**
-
-### AC-1: [场景名称]
-- **Given** [前置条件 / 初始状态]
-- **When** [用户执行的动作]
-- **Then** [可观测的预期结果]
-
-### AC-2: [场景名称]
-- **Given** [前置条件 / 初始状态]
-- **When** [用户执行的动作]
-- **Then** [可观测的预期结果]
-
-### AC-3: [异常 / 边界场景]
-- **Given** [异常前置条件]
-- **When** [触发动作]
-- **Then** [预期的降级表现]
-
-## 5. 界面文案 (UI Copy)
-
-> 实施时须**逐字**使用本表文案，不得自行改写或翻译。所有文案为简体中文。
-
-| 位置 | 文案 |
-|------|------|
-| 页面标题 | |
-| 页面副标题 / 说明 | |
-| 主按钮 | |
-| 次按钮 | |
-| 加载中 (Loading) | 加载中… |
-| 加载失败 (Error) | 加载失败，请重试 |
-| 重试按钮 | 重新加载 |
-| 空状态 (Empty) | 暂无数据 |
-| 成功提示 (Toast) | 操作成功 |
-| 失败提示 (Toast) | 操作失败，请稍后重试 |
-| 表单校验提示 | |
-
-## 6. 技术契约 (Technical Contract)
-
-> **Contract-First**：本节先于任何实现落地。类型未定义完，不得开始写 Mock / Service / UI。
-
-### 6.1 类型定义 (Types) → `src/types/`
-
+### 5.1 核心数据结构 (TypeScript Interfaces)
 ```typescript
-// 在此定义核心 Interface / Type。
-// 约束：禁止使用 any；字段可选性需明确标注；枚举用字面量联合类型。
-// 导入路径统一用 @ 别名（@/* 映射到 src/*），例如 `import type { X } from '@/types/x';`
-
-export interface Example {
+// AI 需在此处定义核心 Mock 数据结构，必须使用 strict 模式
+export interface IUser {
   id: string;
-  name: string;
+  email: string;
+  // ...
 }
 ```
 
-### 6.2 服务接口 (Services) → `src/services/`
+### 5.2 Mock 服务契约 (Service Contract)
+- **延迟模拟**：所有 API 调用必须在 Service 层强制添加 `300ms - 800ms` 的随机延迟 (`setTimeout` 或 `Promise` 包装)。
+- **错误注入**：Mock 数据中需包含触发 Error 状态的数据结构或概率。
+- **状态管理**：[说明使用 Zustand 还是组件内部 state 管理该模块数据]
 
-```typescript
-// 在此定义 Service 函数签名。
-// 约束：一律返回 Promise；实现中必须用 setTimeout 模拟 300-800ms 网络延迟；
-//      UI 只能调用 Service，禁止直接 import src/mocks/。
+## 6. 待澄清问题 (Open Questions)
+> AI 在 Plan 阶段必须主动提出至少 1-3 个关键问题。用户回答后，AI 需更新本文档并将状态推进。
 
-import type { Example } from '@/types/example';
+- [ ] 问题 1：[例如：忘记密码是跳转新页面还是弹窗？]
+- [ ] 问题 2：[例如：邮箱校验需要正则匹配还是仅做非空判断？]
 
-export function fetchExampleList(): Promise<Example[]> {
-  throw new Error('未实现');
-}
-```
+---
 
-### 6.3 状态管理 (State)
+## 📝 变更记录 (Change Log)
+> ⚠️ 发生需求变更时，必须在此追加记录，并将顶部 `status` 重置为 `DRAFT`，同时级联回滚：`tasks.md → DRAFT`、`implement.md → OUTDATED`、`verify.md → INVALIDATED`、`review.md → INVALIDATED`。
 
-- **是否需要全局状态**：[是 / 否]
-- **方案**：Zustand（如需全局状态）/ 组件内 `useState`（局部即可）
-- **Store 文件**：`src/stores/[name].ts`
-
-## 7. 界面与交互约束 (UI/UX)
-
-- [ ] Loading 状态：骨架屏 / Spinner（文案见第 5 节）
-- [ ] Error 状态：错误提示 + 重试入口
-- [ ] Empty 状态：空状态提示
-- [ ] 响应式布局：Mobile + Desktop
-- [ ] 交互元素具备 hover / active 反馈
-- [ ] 技术栈限定：Tailwind CSS（禁止自定义 `.css` / 重型 UI 库）
-
-## 8. 开放问题 (Open Questions)
-
-> 尚未确定、需要人工拍板的事项。无则填「无」。
-
-无。
-
-## 9. 人工审批 (Human Approval)
-
-- **状态**: ⏳ DRAFT
-- **审批人**:
-- **审批意见**:
-- **审批日期**:
-
-> 审批通过后，将本文档 frontmatter 的 `status` 由 `DRAFT` 改为 `APPROVED`，方可进入 Implement 阶段。
+| 日期 | 变更内容简述 | 变更原因/背景 | 影响范围评估 |
+| :--- | :--- | :--- | :--- |
+| YYYY-MM-DD | 初始创建 | 业务方提出原型需求 | 全新模块 |

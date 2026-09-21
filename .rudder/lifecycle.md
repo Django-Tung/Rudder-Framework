@@ -60,8 +60,10 @@ PENDING ──[开始实施]──► IN_PROGRESS ──[编码完成]──► 
                             └────[review 打回返工]──────┘
 ```
 
-状态取值：`PENDING` | `IN_PROGRESS` | `COMPLETED`
+状态取值：`PENDING` | `IN_PROGRESS` | `COMPLETED` | `OUTDATED`
 初值：`PENDING`
+
+- `OUTDATED` 为**需求变更专属失效态**（见 §4.4）：契约已变，旧实现作废。人工重新批准后，由 Implement 阶段重置回 `IN_PROGRESS` 起算。
 
 ### 2.4 `verify.md` — 机器验证
 
@@ -70,10 +72,11 @@ PENDING ──[三项检查全部 0 错误]──► PASS
    └─────[连续失败 3 次]────────► FAIL
 ```
 
-状态取值：`PENDING` | `PASS` | `FAIL`
+状态取值：`PENDING` | `PASS` | `FAIL` | `INVALIDATED`
 初值：`PENDING`
 
 - `FAIL` 为**阻断态**：出现即停止自动修复循环，向人工报告，不得推进到 Review。
+- `INVALIDATED` 为**需求变更专属失效态**（见 §4.4）：契约已变，旧验证证据作废。重新批准后重新执行 Verify，状态从 `PENDING` 起算。
 - 从 `FAIL` 恢复需人工介入；修复后重新执行 Verify，状态回到 `PENDING` 起算。
 
 ### 2.5 `review.md` — 代码审查
@@ -87,10 +90,11 @@ PENDING ──[自检清单填写完毕]──► PENDING_HUMAN_REVIEW
                       APPROVED                 CHANGES_REQUESTED
 ```
 
-状态取值：`PENDING` | `PENDING_HUMAN_REVIEW` | `APPROVED` | `CHANGES_REQUESTED`
+状态取值：`PENDING` | `PENDING_HUMAN_REVIEW` | `APPROVED` | `CHANGES_REQUESTED` | `INVALIDATED`
 初值：`PENDING`
 
 - `CHANGES_REQUESTED` 为**阻断态**：触发返工流程（见 §4.3）。
+- `INVALIDATED` 为**需求变更专属失效态**（见 §4.4）：契约已变，旧审查记录作废。重新批准后重新走 Review，状态从 `PENDING` 起算。
 - **只有人工**可以将 `PENDING_HUMAN_REVIEW` 转为 `APPROVED`，Agent 不得自行批准。
 
 ### 2.6 `commit.md` — 归档提交
@@ -146,13 +150,23 @@ PENDING ──[git commit 成功]──► DONE
 4. 将 `tasks.md` 重置为 `DRAFT`（返工后需重新拆解/勾选）。
 5. 返工完成后，将 `review.md` 重置为 `PENDING`，**重新执行** Verify → Review 全流程。
 
-### 4.4 需求变更（范围蔓延）
+### 4.4 需求变更（范围蔓延 / Scope Creep）
 
-Plan 阶段之后再需要变更范围时：
+当需求处于 Plan 未批准（`plan.md`=`DRAFT`）、已批准（`plan.md`=`APPROVED`）或实施中（`implement.md`=`IN_PROGRESS`）时发生范围变更，**绝不允许就地默默改代码**，必须走以下变更控制协议：
 
-1. 将 `plan.md` 退回 `DRAFT`，更新 Scope / AC / UI 文案。
-2. 将 `tasks.md` 重置为 `DRAFT`，`implement.md` 重置为 `PENDING`，`verify.md` 重置为 `PENDING`。
-3. 重新走"人工批准"门控，批准后方可继续实施。
+1. **评估与更新 Plan**：更新 `plan.md` 的 User Stories 与 AC，并在文件末尾追加/更新 `## 📝 Change Log`（记录日期、内容、原因、影响范围）。
+2. **状态降级**：`plan.md` 重置为 `DRAFT`，等待人工重新批准。
+3. **级联失效（Cascade Invalidation）**：契约已变，旧证据全部作废：
+   - `tasks.md` → `DRAFT`（旧任务清单需重新拆解）
+   - `implement.md` → `OUTDATED`（清空核心实现摘要）
+   - `verify.md` → `INVALIDATED`（清空验证日志）
+   - `review.md` → `INVALIDATED`（清空审查记录）
+4. **代码冻结**：在人工回复“PRD 批准”前，**严禁**修改 `src/` 下任何代码。
+5. **重新批准**：人工批准后，`OUTDATED` / `INVALIDATED` 由对应阶段重置回 `PENDING` 起算，重新走 Tasks → Implement → Verify → Review。
+
+#### 归档后变更（Post-DONE Change）
+
+若目标 REQ 已 `DONE` / 已归档，**禁止就地修改**。必须新建 REQ（如 REQ-002），在 Plan 中注明“继承/扩展自 REQ-001”，保持历史证据不可变。
 
 ### 4.5 整体回滚
 
@@ -182,3 +196,7 @@ Plan 阶段之后再需要变更范围时：
 | `verify.md` | `PENDING` |
 | `review.md` | `PENDING` |
 | `commit.md` | `PENDING` |
+
+> ⚠️ 上表的“重置值”适用于**常规回滚**（review 打回 §4.3、整体回滚 §4.5）。
+> `OUTDATED`（implement）与 `INVALIDATED`（verify / review）是**需求变更专属失效态**（§4.4），
+> 表示“旧证据作废、等待重新批准”，不属于“重置回初值”；重新批准后由对应阶段重置回 `PENDING` 起算。

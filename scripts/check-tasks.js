@@ -22,7 +22,8 @@ function readStatus(file) {
   const m = text.match(/^---\s*\n([\s\S]*?)\n---/);
   if (!m) return null;
   const s = m[1].match(/^status:\s*(.+)$/m);
-  return s ? s[1].trim() : null;
+  // 剥掉行内 YAML 注释（` # ...`），避免状态值被注释污染
+  return s ? s[1].replace(/\s+#.*$/, '').trim() : null;
 }
 
 function listReqDirs() {
@@ -50,7 +51,10 @@ function check(reqDir) {
     return { dir: reqDir, errors: ['缺少 plan.md，跳过'] };
   }
   const planText = readFileSync(planPath, 'utf8');
-  const acIds = [...planText.matchAll(/^###\s+(AC-\d+)/gm)].map((m) => m[1]);
+  // I1 提取 AC 编号，兼容两种声明格式：旧模板 `### AC-1: 场景`、新模板 `- **AC-1: 功能点**`
+  const acIds = [
+    ...new Set([...planText.matchAll(/^(?:###\s*|-\s*\*\*)(AC-\d+)/gm)].map((m) => m[1])),
+  ];
 
   if (!existsSync(tasksPath)) {
     // plan 已批准却无 tasks.md，属拆解缺失

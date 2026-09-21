@@ -72,6 +72,7 @@ requirements/MASTER-PRD.md   全局业务规则与需求索引（脚本维护索
 requirements/_inbox/         导入中间产物（脚本扫描时跳过）
 requirements/archive/        已归档需求
 scripts/                     确定性工具脚本（sync-master-prd / check-tasks / check-import / import-docx）
+docs/                        框架级设计文档（如 rudder-os-upgrade-guide.md，非需求产物）
 .rudder/                     规则与模板（只读，除非在改框架本身）
 ```
 

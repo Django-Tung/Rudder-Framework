@@ -30,7 +30,8 @@ function readFrontmatter(file) {
   const out = {};
   for (const line of m[1].split('\n')) {
     const kv = line.match(/^([a-zA-Z_]+):\s*(.*)$/);
-    if (kv) out[kv[1]] = kv[2].trim();
+    // 剥掉行内 YAML 注释（` # ...`），避免 status/name 等值被注释污染
+    if (kv) out[kv[1]] = kv[2].replace(/\s+#.*$/, '').trim();
   }
   return out;
 }
@@ -64,6 +65,8 @@ function derive(req) {
   if (commit.status === 'DONE') return { status: '✅ DONE', phase: '完成' };
   if (verify.status === 'FAIL') return { status: '⛔ FAIL', phase: 'Verify' };
   if (review.status === 'CHANGES_REQUESTED') return { status: '🔁 返工中', phase: 'Review' };
+  // OUTDATED 表示需求变更后旧实现作废、尚未重新实施；verify/review 的 INVALIDATED 交由下方常规判断兜底
+  if (impl.status === 'OUTDATED') return { status: '🔄 变更中', phase: '变更回滚' };
   if (plan.status !== 'APPROVED') return { status: '🚧 进行中', phase: 'Plan' };
   if (tasks.status !== 'DONE') return { status: '🚧 进行中', phase: 'Tasks' };
   if (impl.status !== 'COMPLETED') return { status: '🚧 进行中', phase: 'Implement' };

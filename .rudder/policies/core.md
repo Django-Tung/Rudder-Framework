@@ -13,6 +13,10 @@
 - **State**: Zustand or React Context. No Redux.
 - **Icons**: Lucide React.
 
+> **依赖豁免（2026-09-21 增补）**：本节白名单约束的是前端运行时依赖（`dependencies`）。
+> `scripts/` 下的 Node 工具/构建脚本允许引入 `devDependencies`，前提是该依赖**不被 `src/` 任何文件 import**，
+> 因而不进入打包产物。校验方式：依赖位于 `devDependencies`；`src/` 全目录 grep 不到该包名；`dist/` 产物中亦无该包名。
+
 ## 🛡️ 3. Rudder Architectural Constraints
 - **Dependency Direction**: UI components MUST fetch data from `src/services/`, NEVER directly from `src/mocks/`.
 - **Contract-First**: Always define `src/types/` before writing mocks or UI.

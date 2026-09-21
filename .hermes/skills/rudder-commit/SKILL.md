@@ -1,6 +1,6 @@
 ---
 name: rudder-commit
-description: Use this skill when the human approves the review. It checks all preconditions, performs garbage collection, and executes an atomic git commit to close the requirement lifecycle.
+description: Use this skill when the human approves the review. It checks five preconditions, performs garbage collection, executes an atomic git commit, and archives the requirement to close the lifecycle.
 ---
 
 # Skill: rudder-commit
@@ -9,11 +9,15 @@ description: Use this skill when the human approves the review. It checks all pr
 
 ## Execution Steps
 1. **Lock Context**: Identify target `REQ-XXX`.
-2. **Precondition Check**: Verify `plan` is APPROVED, `implement` is COMPLETED, `verify` is PASS, and `review` is APPROVED. If any fail, STOP and report.
+2. **Precondition Check**（五项前置）: Verify `plan` is APPROVED, `tasks` is DONE, `implement` is COMPLETED, `verify` is PASS, and `review` is APPROVED. If any fail, STOP and report.
    - 阻断态：`verify.md` 为 `FAIL` 或 `review.md` 为 `CHANGES_REQUESTED` 时**必须 STOP**。完整门控定义见 `.rudder/lifecycle.md` §3。
 3. **Garbage Collection**: Remove unused imports and debug `console.log`s.
-4. **Execute Commit**: 
+4. **Execute Commit**:
    - `git add .` (scoped to this REQ's files)
    - `git commit -m "feat([REQ-XXX]): [中文提交信息]"`
 5. **Finalize**: Update `commit.md` with the commit hash. Set `commit.md` frontmatter `status: DONE`.
-6. **Report**: Celebrate the completion of the requirement lifecycle.
+6. **Archive**（后置动作，见 `.rudder/lifecycle.md` §4.6）:
+   - `git mv requirements/REQ-XXX/ requirements/archive/<YYYY-MM>-REQ-XXX-<kebab-name>/`
+   - 运行 `node scripts/sync-master-prd.js` 更新索引。
+   - 回填 `commit.md` 的 `archived: true`、`archived_at`、`archive_path`。
+7. **Report**: Celebrate the completion and archive of the requirement lifecycle.

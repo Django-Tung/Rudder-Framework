@@ -12,7 +12,7 @@ Initialize a new requirement lifecycle based on the user's raw idea.
 
 ## Execution Steps
 1. **Analyze & Clarify**: If the user's request is ambiguous, ask up to 3 critical clarifying questions in **Simplified Chinese**.
-2. **Generate ID & Directory**: Create a new directory `requirements/REQ-[XXX]-[kebab-case-name]/`. Determine the next available REQ number by scanning the `requirements/` folder.
+2. **Generate ID & Directory**: Create a new directory `requirements/REQ-[XXX]-[kebab-case-name]/`. Determine the next available REQ number by scanning the **union** of `requirements/` and `requirements/archive/` (skip `_`-prefixed directories), taking the maximum number + 1.
 3. **Populate Plan**: Create `plan.md` inside this directory. Fill it out strictly following the template in `.rudder/templates/plan.md`. 
    - Ensure all User Stories, Acceptance Criteria, and UI Copy are in **Simplified Chinese**.
    - Define the Technical Contract (Types, Services).

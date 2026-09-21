@@ -9,7 +9,7 @@ description: Use this skill when the user wants to start a new requirement, anal
 
 ## Execution Steps
 1. **Analyze & Clarify**: If the request is ambiguous, ask up to 3 critical clarifying questions in **Simplified Chinese**.
-2. **Generate ID & Directory**: Create `requirements/REQ-[XXX]-[kebab-case-name]/`. Scan existing folders to determine the next number.
+2. **Generate ID & Directory**: Create `requirements/REQ-[XXX]-[kebab-case-name]/`. Determine the next number by scanning the **union** of `requirements/` and `requirements/archive/` (skip `_`-prefixed directories), taking the max + 1.
 3. **Populate Plan**: Create `plan.md` using the `.rudder/templates/plan.md` structure. 
    - All User Stories, ACs, and UI Copy MUST be in **Simplified Chinese**.
    - Define Technical Contract (Types, Services).

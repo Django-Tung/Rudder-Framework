@@ -16,13 +16,14 @@ Generate machine-verified evidence for the implementation. This is the core Rudd
    - `npm run typecheck` (or `npx tsc --noEmit`)
    - `npm run lint`
    - `npm run build`
+   - `npm run check:tasks`（校验 tasks.md 的不变量 I1/I2，见 `.rudder/lifecycle.md` §4.2）
 3. **Mandatory Feedback Loop**: 
    - If ANY command fails, you MUST read the terminal error, **auto-fix the code**, and re-run the checks. 
    - Repeat this loop until ALL checks pass with 0 errors.
    - **Escape Hatch（最多 3 轮）**: 若连续 3 轮仍然失败，**立即停止**，将 `verify.md` frontmatter `status` 置为 `FAIL`，记录 3 轮的失败命令、错误摘要与已尝试的修复措施，并向人工报告。
 4. **Log Evidence**: Create or update `verify.md`. Log the exact commands run and their successful outputs.
 5. **Set Status**: Change `verify.md` frontmatter `status` to `PASS`. 
-   - ⚠️ 仅当三项检查**全部 0 错误**时才可置为 `PASS`；否则按第 3 步置为 `FAIL`，**不得进入 review 阶段**。
+   - ⚠️ 仅当四项检查**全部 0 错误**时才可置为 `PASS`；否则按第 3 步置为 `FAIL`，**不得进入 review 阶段**。
 6. **Report**: "✅ 验证通过。所有构建和 Lint 检查均已通过，机器证据已记录在 verify.md。请下达 review 指令。"
 
 ## Arguments

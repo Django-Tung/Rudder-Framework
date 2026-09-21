@@ -15,10 +15,11 @@
 | 命令 | 作用 |
 |------|------|
 | `/rudder-plan [需求描述]` | 澄清需求 → 生成 `requirements/REQ-XXX-*/plan.md`（PRD + 技术契约） |
-| `/rudder-implement [REQ-ID]` | 按契约实施 Types → Mocks → Services → UI |
-| `/rudder-verify [REQ-ID]` | 跑 typecheck / lint / build，自动修复，记录机器证据 |
+| `/rudder-import [文档路径]` | 导入 .docx/.md/.txt，归一化 Markdown 并智能拆分 |
+| `/rudder-implement [REQ-ID]` | 拆解 tasks.md 后按契约实施 Types → Mocks → Services → UI |
+| `/rudder-verify [REQ-ID]` | 跑 typecheck / lint / build / check:tasks，自动修复，记录机器证据 |
 | `/rudder-review [REQ-ID]` | 对照 `plan.md` 的 AC 逐条核对，交人工审批 |
-| `/rudder-commit [REQ-ID]` | 校验四项前置状态 → 原子 git 提交 |
+| `/rudder-commit [REQ-ID]` | 校验五项前置状态 → 原子 git 提交 + 归档 |
 
 完整流程见 `README.md`。
 
@@ -32,10 +33,11 @@
 **技术栈（不得引入清单外依赖）**
 - React 19 + TypeScript(strict) + Vite + Tailwind CSS v4 + Zustand + Lucide React
 - 禁止重型 UI 库（Ant Design、MUI 等）、禁止 Redux
+- 依赖豁免：`scripts/` 下 Node 工具脚本可用 `devDependencies`（不得被 `src/` import，见 core.md §2）
 
 **由 lint 强制（`npm run lint` 会以 exit 1 拦截）**
 - 禁止 `any`
-- 禁止 `console.log`（允许 `console.warn` / `console.error`）
+- `src/` 下禁止 `console.log`（允许 `console.warn` / `console.error`）；`scripts/` 的 Node 脚本不受此限
 - 禁止 `debugger`
 
 **架构**
@@ -50,7 +52,7 @@
 **流程**
 - 严格遵循 `.rudder/lifecycle.md`，不得越级推进。
 - `plan.md` 的 `APPROVED` **只能由人工写入**，Agent 不得自行批准。
-- 每个需求的产物落在 `requirements/REQ-XXX-*/` 下，5 个文件各记录自己 frontmatter 里的 `status`。
+- 每个需求的产物落在 `requirements/REQ-XXX-*/` 下，6 个文件（含 `tasks.md`）各记录自己 frontmatter 里的 `status`。
 
 ## 工程结构
 
@@ -65,7 +67,11 @@ src/
 ├── App.tsx
 └── main.tsx
 
-requirements/REQ-XXX-name/   {plan,implement,verify,review,commit}.md
+requirements/REQ-XXX-name/   {plan,tasks,implement,verify,review,commit}.md
+requirements/MASTER-PRD.md   全局业务规则与需求索引（脚本维护索引块）
+requirements/_inbox/         导入中间产物（脚本扫描时跳过）
+requirements/archive/        已归档需求
+scripts/                     确定性工具脚本（sync-master-prd / check-tasks / check-import / import-docx）
 .rudder/                     规则与模板（只读，除非在改框架本身）
 ```
 

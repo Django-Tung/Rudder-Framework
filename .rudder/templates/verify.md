@@ -43,6 +43,16 @@ PENDING
 [粘贴终端输出]
 ```
 
+### 任务清单校验 (check-tasks)
+
+- **命令**: `npm run check:tasks`
+- **结果**: ❌ PENDING
+- **输出**:
+
+```text
+[粘贴终端输出]
+```
+
 ## 架构检查 (Architecture Checks)
 
 - [ ] UI 组件未直接 import `src/mocks/`
@@ -68,6 +78,7 @@ PENDING
 - **Typecheck**: ❌ PENDING
 - **Lint**: ❌ PENDING
 - **Build**: ❌ PENDING
+- **Check-tasks**: ❌ PENDING
 - **Architecture**: ❌ PENDING
 - **Scope**: ❌ PENDING
 - **综合结果**: ❌ PENDING

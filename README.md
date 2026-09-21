@@ -6,7 +6,7 @@ Rudder OS 是一个为 AI Agent（如 Claude Code, Hermes Agent）设计的结�
 ### 核心设计理念
 - **规则与事实分离**：`.rudder/` 存放不可变的工程规则与模板；`requirements/` 存放具体需求的执行记录与证据。
 - **证据优于承诺**：AI 不能口头声称“代码没问题”，必须在 `verify.md` 中留下机器验证（Build/Lint）通过的日志证据。
-- **状态机驱动**：每个需求必须严格按 `Plan -> Implement -> Verify -> Review -> Commit` 流转，不可越级。
+- **状态机驱动**：每个需求必须严格按 `Plan -> Tasks -> Implement -> Verify -> Review -> Commit` 流转（归档为 Commit 的后置动作），不可越级。
 
 ---
 
@@ -17,18 +17,23 @@ Rudder OS 是一个为 AI Agent（如 Claude Code, Hermes Agent）设计的结�
 ```text
 project/
 ├── .rudder/                  # 【规则与模板】AI 的行为准则
-│   ├── lifecycle.md          # 状态机流转规则
-│   ├── policies/             # 核心工程规范（技术栈、中文约束、反馈闭环）
-│   └── templates/            # 需求生命周期文档模板 (plan, implement, verify, review, commit)
+│   ├── lifecycle.md          # 状态机流转规则（6 阶段 + 归档后置动作）
+│   ├── policies/             # 核心工程规范（技术栈、中文约束、反馈闭环、导入解析）
+│   └── templates/            # 需求生命周期文档模板 (plan, tasks, implement, verify, review, commit)
 │
 ├── requirements/             # 【事实与证据】具体需求的工作区
-│   └── REQ-001-xxx/          # 单个需求的完整生命周期档案
-│       ├── plan.md
-│       ├── implement.md
-│       ├── verify.md
-│       ├── review.md
-│       └── commit.md
+│   ├── MASTER-PRD.md         # 全局业务规则、术语表、需求状态索引（脚本维护索引块）
+│   ├── REQ-001-xxx/          # 单个需求的完整生命周期档案
+│   │   ├── plan.md
+│   │   ├── tasks.md
+│   │   ├── implement.md
+│   │   ├── verify.md
+│   │   ├── review.md
+│   │   └── commit.md
+│   ├── _inbox/               # 导入中间产物（脚本扫描时跳过）
+│   └── archive/              # 已完成需求归档目录
 │
+├── scripts/                  # 确定性工具脚本（sync-master-prd / check-tasks / check-import / import-docx）
 ├── .claude/commands/         # Claude Code 专属触发命令
 └── .hermes/skills/           # Hermes Agent 专属触发技能
 ```
@@ -37,7 +42,7 @@ project/
 
 ## 3. 标准工作流 (The Workflow)
 
-一个需求从提出到归档，需经历以下 5 个标准阶段。
+一个需求从提出到归档，需经历以下 6 个标准阶段（另含 Commit 后的归档后置动作）。
 
 ### 阶段 1：Plan (需求规划)
 **目标**：将模糊的想法转化为结构化的 PRD 和技术契约。
@@ -52,8 +57,9 @@ project/
 1. **用户操作**：下达实施指令（如：“开始实施 REQ-001”）。
 2. **AI 响应**：
    - 锁定当前 `REQ-XXX` 目录。
-   - 严格按顺序开发：`Types` -> `Mocks` (含 300-800ms 延迟) -> `Services` -> `UI` (含 Loading/Error/Empty 状态，且文案全为中文)。
-   - 将变更摘要和文件列表写入 `implement.md`，状态设为 `COMPLETED`。
+   - 按 `plan.md` 验收标准拆解 `tasks.md`（每条标注 AC 编号，状态 `READY`）。
+   - 严格按顺序开发：`Types` -> `Mocks` (含 300-800ms 延迟) -> `Services` -> `UI` (含 Loading/Error/Empty 状态，且文案全为中文)，并实时勾选 `tasks.md`。
+   - 全部勾选后置 `tasks.md` 为 `DONE`，将变更摘要和文件列表写入 `implement.md`，状态设为 `COMPLETED`。
 3. **门控 (Gate)**：AI 提示实施完成，等待验证指令。
 
 ### 阶段 3：Verify (机器验证)
@@ -94,6 +100,7 @@ project/
 
 | 阶段 | 用户输入示例 |
 | :--- | :--- |
+| **Import** | `/rudder-import 需求文档.docx` |
 | **Plan** | `/rudder-plan 用户登录功能，需要邮箱密码和记住我` |
 | **Implement** | `/rudder-implement REQ-001` |
 | **Verify** | `/rudder-verify REQ-001` |
@@ -105,11 +112,12 @@ project/
 
 | 阶段 | 用户输入示例 |
 | :--- | :--- |
+| **Import** | "调用 rudder-import 技能，导入需求文档.docx。" |
 | **Plan** | "调用 rudder-plan 技能。我想做一个用户登录功能，需要邮箱密码和记住我。" |
 | **Implement** | "PRD 已批准。调用 rudder-implement 技能，开始实施 REQ-001。" |
 | **Verify** | "调用 rudder-verify 技能，验证 REQ-001 的代码并生成验证证据。" |
 | **Review** | "调用 rudder-review 技能，检查 REQ-001 是否符合 PRD 验收标准。" |
-| **Commit** | "Review 已通过。调用 rudder-commit 技能，提交 REQ-001。" |
+| **Commit** | "Review 已通过。调用 rudder-commit 技能，提交并归档 REQ-001。" |
 
 > ⚠️ **双份维护**：`.claude/commands/rudder-*.md` 与 `.hermes/skills/rudder-*/SKILL.md` 是同一套流程面向两个 runtime 的两种表述，内容必须保持等价。**修改任一阶段的行为时，两份都要改。**
 

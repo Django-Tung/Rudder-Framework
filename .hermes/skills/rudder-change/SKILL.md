@@ -1,34 +1,37 @@
 ---
 name: rudder-change
-description: 当用户提出对正在进行中或已规划的需求进行范围变更、增加新功能或修改现有逻辑时触发此技能。它会安全地更新需求文档并回滚失效的开发状态。
-version: 1.0.0
+description: Handle scope creep by updating PRD, invalidating downstream evidence, and freezing code.
+triggers:
+  - 需求变更 REQ-
+  - 修改需求 REQ-
+  - rudder-change
+  - 加个功能 REQ-
+  - 变更需求
 ---
 
-# 技能: 需求变更控制 (Rudder-Change)
+# Skill: rudder-change
 
-## 触发意图
-- “在 REQ-001 里加一个忘记密码的功能”
-- “刚才的登录需求变了，不需要记住我选项了，改成手机号验证码”
-- “需求有变，更新一下 REQ-002 的规划”
+> ⚠️ **Dual Maintenance**: This file is semantically equivalent to `.claude/commands/rudder-change.md`.
 
-## 执行逻辑
+## Goal
+Handle scope creep by updating the PRD, invalidating downstream evidence, and freezing code until human re-approval.
 
-作为 Hermes Agent，当你被触发此技能时，请严格执行以下“变更控制协议”：
+## Parameter Extraction
+Extract the target REQ-ID and the description of the change from user input. If missing, **MUST ask in Chinese**.
 
-1. **识别目标**: 从用户对话中提取目标 `REQ-ID` 和具体的 `变更描述`。如果未提供 REQ-ID，请先询问用户要变更哪个需求。
-2. **归档保护检查**: 读取 `requirements/<REQ-ID>/plan.md`。
-   - 如果 `plan.md` 不存在，报错并提示用户先使用 `/rudder-plan` 创建需求。
-   - 如果 `status` 是 `DONE`，告知用户：“该需求已完成归档。为了保证代码历史和验证证据的纯净，我们应该创建一个新的需求（例如 REQ-XXX）来承接这个变更。需要我帮你起草新需求的 Plan 吗？”
-   - 如果未完成，继续下一步。
-3. **更新契约 (Plan)**: 
-   - 修改 `plan.md` 中的用户故事和验收标准 (AC) 以反映新需求。
-   - 在文件末尾添加 `## 📝 Change Log`，记录本次变更的日期、内容、原因和影响范围。
-   - 将 `plan.md` 的状态设为 `DRAFT`。
-4. **熔断与回滚**: 明确指出旧的实现和验证已失效。将同目录下的 `tasks.md` 设为 `DRAFT`，`implement.md` 设为 `OUTDATED`，`verify.md` 与 `review.md` 设为 `INVALIDATED`，防止 AI 后续基于错误的上下文继续工作。
-5. **请求批准**: 向用户汇报变更影响，并明确要求：“请审查更新后的 `plan.md`。确认无误后，请回复‘PRD 批准’，我将重新进入 Implement 阶段。”
+## Execution Steps
+1. **Update Plan**: Update User Stories / AC in `plan.md`. Append `## 📝 Change Log` at the end (record date, content, reason, impact scope).
+2. **Cascade Invalidation**: 
+   - `plan.md` -> `DRAFT`
+   - `tasks.md` -> `DRAFT`
+   - `implement.md` -> `OUTDATED`
+   - `verify.md` -> `INVALIDATED`
+   - `review.md` -> `INVALIDATED`
+3. **Code Freeze**: 
+   - **STRICT CONSTRAINT**: **FORBIDDEN** to modify any code under `src/` before the user replies "PRD 批准".
+4. **Report**: Inform the user that changes are logged, downstream evidence is invalidated, and code is frozen.
 
-## 关键规则 (Rules)
-- **证据优先**: 必须实际写入 Markdown 文件并修改 Frontmatter，不能仅在对话中说明。
-- **单线程原则**: 在处理此变更时，不要同时响应其他 REQ 的开发请求。
-- **代码冻结**: 在用户给出“PRD 批准”指令前，严禁对 `src/` 目录进行任何代码修改。
-- **状态收尾**: 人工批准后，`OUTDATED` / `INVALIDATED` 由后续阶段重置回 `PENDING` 起算，本技能不负责反向迁移。
+## 🗣️ Interaction & Output Constraints (STRICT)
+- **Change Log**: The content of the `Change Log` in `plan.md` **MUST be written in Chinese**.
+- **User Interaction**: The report informing the user about the freeze and requesting re-approval **MUST be in Chinese**.
+  - *Required Prompt*: "需求变更已记录，下游证据已级联失效，代码已冻结。请 Review 新的 plan.md。确认无误后，请回复：**PRD 批准，状态改为 APPROVED** 以解冻代码。"

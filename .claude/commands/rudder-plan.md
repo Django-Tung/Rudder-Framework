@@ -1,24 +1,31 @@
 ---
-description: 启动新需求：分析原始想法、澄清歧义，生成 PRD 与技术契约（plan.md）
-argument-hint: [原始需求描述]
+description: Elaborate a skeleton or input into a structured PRD (plan.md) with AC and Page Structure.
+argument-hint: [REQ-ID or Description]
 ---
 
 # Command: rudder-plan
 
-> ⚠️ **双份维护**：本文件与 `.hermes/skills/rudder-plan/SKILL.md` 内容等价（面向不同 runtime）。修改任一份时必须同步另一份。
+> ⚠️ **Dual Maintenance**: Semantically equivalent to `.hermes/skills/rudder-plan/SKILL.md`.
 
 ## Goal
-Initialize a new requirement lifecycle based on the user's raw idea.
+Transform a vague idea or pre-built skeleton into a contract-first PRD (`plan.md`) with AC and Page Structure.
 
 ## Execution Steps
-1. **Analyze & Clarify**: If the user's request is ambiguous, ask up to 3 critical clarifying questions in **Simplified Chinese**.
-2. **Generate ID & Directory**: Create a new directory `requirements/REQ-[XXX]-[kebab-case-name]/`. Determine the next available REQ number by scanning the **union** of `requirements/` and `requirements/archive/` (skip `_`-prefixed directories), taking the maximum number + 1.
-3. **Populate Plan**: Create `plan.md` inside this directory. Fill it out strictly following the template in `.rudder/templates/plan.md`. 
-   - Ensure all User Stories, Acceptance Criteria, and UI Copy are in **Simplified Chinese**.
-   - Define the Technical Contract (Types, Services).
-4. **Set Status**: Ensure the YAML frontmatter `status` is `DRAFT`（状态机定义见 `.rudder/lifecycle.md`）。
-   - ⚠️ 不得自行置为 `APPROVED`，该状态只能由人工批准后写入。
-5. **Report**: Output the file path. Ask the human: "请 Review 此 PRD (plan.md)。如果没问题，请回复 'PRD 批准'，我将把状态改为 APPROVED 并等待实施指令。"
+1. **Context Loading**: 
+   - If `REQ-XXX`: Read skeleton and specific snippet from `import-report.md`. **FORBIDDEN to re-read raw doc.**
+   - If new description: Generate new directory and skeleton.
+2. **Clarify First**: 
+   - If Completeness is Medium/Low, **MUST ask clarification questions first**.
+   - **NEVER guess** before user answers.
+3. **Elaborate**: Complete `plan.md` **MUST** include:
+   - Business Background & Non-Goals
+   - User Stories & Scenarios
+   - **BDD Acceptance Criteria**: Strictly numbered `AC-1`, `AC-2`.
+   - 📐 **Page Structure & Component Skeleton**: Nested lists/ASCII for layout and React component hierarchy.
+   - UI/UX Tri-state Specs & Tech Contract.
+4. **Gate**: Set `plan.md` status to `DRAFT`. Present core PRD to user and ask for approval.
 
-## Arguments
-$ARGUMENTS (The raw requirement description)
+## 🗣️ Interaction & Output Constraints (STRICT)
+- **User Interaction**: ALL clarification questions and the final approval prompt **MUST be in Chinese**. 
+  - *Required Approval Prompt*: "请 Review。确认无误后，请回复：**PRD 批准，状态改为 APPROVED**"
+- **Business Content**: The entire content of `plan.md` (Background, Stories, ACs, Page Structure) **MUST be written in Chinese**. Technical terms/YAML keys can be English.

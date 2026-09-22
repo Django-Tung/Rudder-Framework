@@ -33,6 +33,25 @@ created: YYYY-MM-DD
   - **When** [用户操作，如：点击登录]
   - **Then** [预期结果，如：按钮恢复可用，页面顶部弹出中文错误提示“服务器开小差了，请稍后再试”]
 
+  ## 📐 页面结构与组件骨架 (Page Structure)
+
+  > 说明：定义页面的宏观布局与核心组件层级，作为 Implement 阶段 React 组件拆分与 Tailwind 布局的直接依据。
+
+  ### 1. 整体布局 (Layout)
+    - **顶部导航 (Header)**: 包含 Logo、全局搜索框、用户头像下拉菜单。
+    - **左侧边栏 (Sidebar)**: 包含一级/二级菜单，支持折叠。
+    - **主内容区 (Main Content)**: 占据剩余空间，内部采用卡片式布局。
+
+  ### 2. 核心组件树 (Component Tree)
+  - `<DashboardPage>`
+    - `<StatsOverview />` (展示 4 个核心指标卡片，Grid 布局)
+    - `<RecentActivityTable />` (展示最近操作记录，包含分页器)
+    - `<QuickActionsPanel />` (右侧悬浮或底部的快捷操作按钮组)
+
+  ### 3. 关键交互占位 (Interaction Slots)
+    - 在 `<StatsOverview />` 的每个卡片右上角，预留 `<TrendIndicator />` 组件位置（用于显示环比上升/下降箭头）。
+    - 在 `<RecentActivityTable />` 的表头，预留 `<ColumnFilter />` 组件位置。
+
 ## 4. UI/UX 与状态规范 (UI/UX & State Specifications)
 > 🚨 **Rudder-OS 强制约束**：AI 必须处理以下所有 UI 状态，且所有面向用户的文案**必须为简体中文**。
 

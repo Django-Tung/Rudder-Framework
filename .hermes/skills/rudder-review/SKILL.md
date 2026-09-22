@@ -1,27 +1,36 @@
 ---
 name: rudder-review
-description: Use this skill after verification passes. It compares the actual code against the plan.md acceptance criteria and populates the review.md checklist for human approval.
+description: Self-review against plan.md, checking AC and Page Structure compliance, then await human approval.
+triggers:
+  - 审查 REQ-
+  - Code Review REQ-
+  - rudder-review
+  - 检查一下代码
+  - 代码审查
 ---
 
 # Skill: rudder-review
 
-> ⚠️ **双份维护**：本文件与 `.claude/commands/rudder-review.md` 内容等价（面向不同 runtime）。修改任一份时必须同步另一份。
+> ⚠️ **Dual Maintenance**: This file is semantically equivalent to `.claude/commands/rudder-review.md`.
+
+## Goal
+Perform a self-review against the approved PRD, specifically checking Acceptance Criteria and Page Structure compliance, then await human approval.
+
+## Parameter Extraction
+Extract the target REQ-ID. If missing, **MUST ask in Chinese**.
 
 ## Execution Steps
-1. **Lock Context**: Ensure target `REQ-XXX` has `verify.md` status as `PASS`.
-2. **Compliance Check**: Read `plan.md` and compare against the code.
-3. **Populate Review**: Update `review.md` checklist:
-   - Requirement Compliance (ACs met?)
-   - Architecture (UI -> Service -> Mock?)
-   - Scope (No out-of-scope features?)
-   - Code Quality (No `any`, no debug logs?)
-   - UI (All text in Simplified Chinese?)
-4. **Set Status**: Set `review.md` frontmatter `status: PENDING_HUMAN_REVIEW`.
-5. **Report**: State the checklist is filled. Ask the human to perform Code Review and reply "Review 通过" to proceed to commit, or "要求修改：[具体问题]" to send it back.
+1. **Check Gate**: Confirm `verify.md` status **MUST** be `PASS`.
+2. **Self-Review**: Check code against `plan.md` and fill the `review.md` checklist:
+   - [ ] **Architecture**: Tech stack constraints met (no heavy libs, no custom CSS)?
+   - [ ] **Scope**: Non-Goals strictly followed?
+   - [ ] **AC Coverage**: All AC-N implemented?
+   - [ ] **📐 Page Structure Compliance**: Does the actual code component tree and layout match the [Page Structure] in `plan.md` exactly? No unauthorized additions/deletions?
+3. **Update Status**: Set `review.md` status to `PENDING_HUMAN_REVIEW`.
+4. **Gate**: Prompt user for human review. 
+   - If user requests changes: Set `review.md` to `CHANGES_REQUESTED`, and cascade reset downstream states (`implement`->IN_PROGRESS, `verify`->PENDING, `tasks`->DRAFT).
 
-## 人工打回返工 (Rework Path)
-当人工回复"要求修改：[具体问题]"时，按 `.rudder/lifecycle.md` §4.2 执行：
-1. 将 `review.md` frontmatter `status` 置为 `CHANGES_REQUESTED`（作为本轮被打回的记录留存）。
-2. 将 `implement.md` `status` 重置为 `IN_PROGRESS`，携带人工意见退回实施。
-3. 将 `verify.md` `status` 重置为 `PENDING`（旧验证证据随代码变更作废）。
-4. 返工完成后，将 `review.md` `status` 重置为 `PENDING`，重新执行 verify → review 全流程。
+## 🗣️ Interaction & Output Constraints (STRICT)
+- **User Interaction**: The prompt asking for human review **MUST be in Chinese**.
+  - *Required Prompt*: "代码自检已完成，请进行人工 Review。确认无误后，请回复：**Review 通过，状态改为 APPROVED**。如需修改，请指出具体问题。"
+- **Review Content**: The self-review comments and checklist details in `review.md` **MUST be written in Chinese**.

@@ -1,20 +1,36 @@
 ---
 name: rudder-verify
-description: Use this skill to run machine checks (typecheck, lint, build). Crucially, it enforces a self-correcting feedback loop to fix errors automatically before logging PASS to verify.md.
+description: Run machine verification commands and record exact terminal output as undeniable proof.
+triggers:
+  - 验证 REQ-
+  - 检查代码 REQ-
+  - rudder-verify
+  - 跑一下验证
+  - 机器验证
 ---
 
 # Skill: rudder-verify
 
-> ⚠️ **双份维护**：本文件与 `.claude/commands/rudder-verify.md` 内容等价（面向不同 runtime）。修改任一份时必须同步另一份。
+> ⚠️ **Dual Maintenance**: This file is semantically equivalent to `.claude/commands/rudder-verify.md`.
+
+## Goal
+Run deterministic machine verification commands and record the exact terminal output as undeniable proof of passing.
+
+## Parameter Extraction
+Extract the target REQ-ID. If missing, **MUST ask in Chinese**.
 
 ## Execution Steps
-1. **Lock Context**: Ensure target `REQ-XXX` has `implement.md` status as `COMPLETED`.
-2. **Execute Checks**: Run `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run check:tasks`（校验 tasks.md 不变量 I1/I2，见 `.rudder/lifecycle.md` §4.2）.
-3. **Mandatory Feedback Loop**: 
-   - If ANY fails, read the terminal error, **auto-fix the code**, and re-run. 
-   - Repeat until ALL pass with 0 errors.
-   - **Escape Hatch（最多 3 轮）**: 若连续 3 轮仍然失败，**立即停止**，将 `verify.md` frontmatter `status` 置为 `FAIL`，记录 3 轮的失败命令、错误摘要与已尝试的修复措施，并向人工报告。
-4. **Log Evidence**: Update `verify.md` with the exact commands and successful outputs.
-5. **Set Status**: Set `verify.md` frontmatter `status: PASS`. 
-   - ⚠️ 仅当四项检查**全部 0 错误**时才可置为 `PASS`；否则按第 3 步置为 `FAIL`，**不得进入 review 阶段**。
-6. **Report**: Confirm verification passed and evidence is logged. Ask for the review command.
+1. **Check Gate**: Confirm `implement.md` status **MUST** be `COMPLETED`.
+2. **Execute Commands**: Run sequentially in terminal:
+   - `npm run typecheck`
+   - `npm run lint`
+   - `npm run build`
+3. **Auto-Fix Loop**: 
+   - If any command fails, **MUST** read terminal errors, auto-fix code, and retry.
+   - Maximum 3 retries allowed.
+4. **Record Evidence**: 
+   - If passed within 3 retries: Record the **EXACT full terminal output** into `verify.md`, set status to `PASS`.
+   - If failed 3 times: Stop immediately, set `verify.md` status to `FAIL`, and report to user. **NEVER** proceed to Review.
+
+## 🗣️ Interaction & Output Constraints (STRICT)
+- **User Interaction**: If verification fails after 3 retries, the error report, analysis, and explanation to the user **MUST be in Chinese**.

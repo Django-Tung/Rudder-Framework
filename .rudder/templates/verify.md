@@ -43,9 +43,19 @@ PENDING
 [粘贴终端输出]
 ```
 
-### 任务清单校验 (check-tasks)
+### 技能投影校验 (check-skills)
 
-- **命令**: `npm run check:tasks`
+- **命令**: `npm run check:skills`
+- **结果**: ❌ PENDING
+- **输出**:
+
+```text
+[粘贴终端输出]
+```
+
+### REQ 结构与状态校验 (check-req)
+
+- **命令**: `npm run check:req`
 - **结果**: ❌ PENDING
 - **输出**:
 
@@ -78,7 +88,8 @@ PENDING
 - **Typecheck**: ❌ PENDING
 - **Lint**: ❌ PENDING
 - **Build**: ❌ PENDING
-- **Check-tasks**: ❌ PENDING
+- **Check-skills**: ❌ PENDING
+- **Check-req**: ❌ PENDING
 - **Architecture**: ❌ PENDING
 - **Scope**: ❌ PENDING
 - **综合结果**: ❌ PENDING

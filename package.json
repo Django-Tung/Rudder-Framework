@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "check:tasks": "node scripts/check-tasks.js",
-    "sync:master": "node scripts/sync-master-prd.js"
+    "sync:master": "node scripts/sync-master-prd.js",
+    "sync:skills": "node scripts/sync-skills.js",
+    "check:skills": "node scripts/sync-skills.js --check"
   },
   "dependencies": {
     "lucide-react": "^1.46.0",

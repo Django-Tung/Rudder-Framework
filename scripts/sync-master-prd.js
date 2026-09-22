@@ -3,6 +3,8 @@
  *
  * - 零第三方依赖（Node 内置 + 正则）。
  * - 扫描 requirements/ 下的 REQ 目录 与 requirements/archive/，跳过 `_` 前缀目录。
+ * - 索引的 `状态` / `依赖` / `来源` 三列**从各 REQ 的 README.md 读取**（单一真相源，
+ *   见 .rudder/requirement/structure.md §4）；`Phase` 列由 6 个阶段产物推导，仅供人读。
  * - 幂等；`--check` 模式只断言索引与事实一致，不写入。
  *
  * 用法：
@@ -20,6 +22,8 @@ const ARCHIVE_DIR = join(REQ_DIR, 'archive');
 const MASTER = join(REQ_DIR, 'MASTER-PRD.md');
 const BEGIN = '<!-- BEGIN:AUTO-INDEX -->';
 const END = '<!-- END:AUTO-INDEX -->';
+const COLUMNS = ['需求ID', '名称', '状态', 'Phase', '依赖', '来源', '路径'];
+const EMPTY = '—';
 
 /** 读取文件 frontmatter，返回 key -> value 对象；缺失/无 frontmatter 返回空对象。 */
 function readFrontmatter(file) {
@@ -30,8 +34,8 @@ function readFrontmatter(file) {
   const out = {};
   for (const line of m[1].split('\n')) {
     const kv = line.match(/^([a-zA-Z_]+):\s*(.*)$/);
-    // 剥掉行内 YAML 注释（` # ...`），避免 status/name 等值被注释污染
-    if (kv) out[kv[1]] = kv[2].replace(/\s+#.*$/, '').trim();
+    // 剥掉行内 YAML 注释（` # ...`）与包裹引号，避免 status/title 等值被污染
+    if (kv) out[kv[1]] = kv[2].replace(/\s+#.*$/, '').trim().replace(/^["']|["']$/g, '');
   }
   return out;
 }
@@ -53,8 +57,13 @@ function listReqs() {
   return out;
 }
 
-/** 依据 §3.P2.1 状态映射表推导索引状态与阶段。 */
-function derive(req) {
+/**
+ * 由 6 个阶段产物推导「当前阶段」列。
+ *
+ * 注意：**这不是 `状态` 列的来源**——`状态` 一律取自 `README.md`（见文件头注释）。
+ * 本列保留阶段细分（Plan / Tasks 之分、变更回滚），供人快速定位进度。
+ */
+function derivePhase(req) {
   const plan = readFrontmatter(join(req.dir, 'plan.md'));
   const tasks = readFrontmatter(join(req.dir, 'tasks.md'));
   const impl = readFrontmatter(join(req.dir, 'implement.md'));
@@ -62,33 +71,64 @@ function derive(req) {
   const review = readFrontmatter(join(req.dir, 'review.md'));
   const commit = readFrontmatter(join(req.dir, 'commit.md'));
 
-  if (commit.status === 'DONE') return { status: '✅ DONE', phase: '完成' };
-  if (verify.status === 'FAIL') return { status: '⛔ FAIL', phase: 'Verify' };
-  if (review.status === 'CHANGES_REQUESTED') return { status: '🔁 返工中', phase: 'Review' };
-  // OUTDATED 表示需求变更后旧实现作废、尚未重新实施；verify/review 的 INVALIDATED 交由下方常规判断兜底
-  if (impl.status === 'OUTDATED') return { status: '🔄 变更中', phase: '变更回滚' };
-  if (plan.status !== 'APPROVED') return { status: '🚧 进行中', phase: 'Plan' };
-  if (tasks.status !== 'DONE') return { status: '🚧 进行中', phase: 'Tasks' };
-  if (impl.status !== 'COMPLETED') return { status: '🚧 进行中', phase: 'Implement' };
-  if (verify.status !== 'PASS') return { status: '🚧 进行中', phase: 'Verify' };
-  if (review.status !== 'APPROVED') return { status: '🚧 进行中', phase: 'Review' };
-  return { status: '🚧 进行中', phase: 'Commit' };
+  if (commit.status === 'DONE') return '完成';
+  if (verify.status === 'FAIL') return 'Verify';
+  if (review.status === 'CHANGES_REQUESTED') return 'Review';
+  // OUTDATED 表示需求变更后旧实现作废、尚未重新实施
+  if (impl.status === 'OUTDATED') return '变更回滚';
+  if (plan.status !== 'APPROVED') return 'Plan';
+  if (tasks.status !== 'DONE') return 'Tasks';
+  if (impl.status !== 'COMPLETED') return 'Implement';
+  if (verify.status !== 'PASS') return 'Verify';
+  if (review.status !== 'APPROVED') return 'Review';
+  return 'Commit';
+}
+
+/** 把 frontmatter 里的行内列表 `[REQ-001, REQ-002]` 渲染成单元格文本。 */
+function formatDeps(raw) {
+  if (!raw) return EMPTY;
+  const inner = raw.replace(/^\[/, '').replace(/\]$/, '').trim();
+  if (inner === '') return EMPTY;
+  return inner
+    .split(',')
+    .map((s) => s.trim().replace(/^["']|["']$/g, ''))
+    .filter(Boolean)
+    .join(', ') || EMPTY;
 }
 
 function buildBlock(reqs) {
   const lines = [
-    '| 需求ID | 名称 | 状态 | Phase | 路径 |',
-    '|--------|------|------|-------|------|',
+    `| ${COLUMNS.join(' | ')} |`,
+    `|${COLUMNS.map(() => '------').join('|')}|`,
   ];
   const sorted = [...reqs].sort((a, b) => a.id.localeCompare(b.id));
   for (const req of sorted) {
-    const plan = readFrontmatter(join(req.dir, 'plan.md'));
-    const displayName = plan.name || req.name;
-    const s = derive(req);
+    const readme = readFrontmatter(join(req.dir, 'README.md'));
+    const id = readme.id || req.id;
+    const title = readme.title || req.name;
+    const status = readme.status || '（缺 README.md）';
+    const deps = formatDeps(readme.deps);
+    const source = readme.source || EMPTY;
     const rel = relative(REQ_DIR, req.dir);
-    lines.push(`| ${req.id} | ${displayName} | ${s.status} | ${s.phase} | ${rel}/ |`);
+    lines.push(`| ${id} | ${title} | ${status} | ${derivePhase(req)} | ${deps} | ${source} | ${rel}/ |`);
   }
   return lines.join('\n');
+}
+
+/** 逐行列出标记块与派生结果的差异，便于定位漂移。 */
+function reportDiff(existing, derived) {
+  const a = existing.split('\n');
+  const b = derived.split('\n');
+  const n = Math.max(a.length, b.length);
+  const diffs = [];
+  for (let i = 0; i < n; i += 1) {
+    if (a[i] !== b[i]) {
+      diffs.push(`  行 ${i + 1}:`);
+      diffs.push(`    索引: ${a[i] ?? '（缺行）'}`);
+      diffs.push(`    事实: ${b[i] ?? '（缺行）'}`);
+    }
+  }
+  return diffs.join('\n');
 }
 
 function main() {
@@ -119,6 +159,7 @@ function main() {
       process.exitCode = 0;
     } else {
       console.error('❌ 索引与事实不一致，请运行 node scripts/sync-master-prd.js 更新');
+      console.error(reportDiff(existingBlock, block));
       process.exitCode = 1;
     }
     return;

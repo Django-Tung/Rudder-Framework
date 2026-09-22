@@ -1,8 +1,14 @@
 # Rudder-OS V6 · 需求生命周期与规则体系（最终设计）
 
+> **⚠️ 本文已实现，现状请以 `.rudder/` 为准。**
+> 本文是 V6 整改的**设计记录**，其内容已由变更 `v6-requirement-lifecycle` 落地。
+> 文中出现的 `.rudder/lifecycle.md` / `.rudder/policies/` 路径是**设计时的旧路径**，
+> 现已分别迁移到 `.rudder/workflow/{lifecycle,states,gates,transitions}.md` 与
+> `.rudder/constitution.md` / `.rudder/import/`。规则现状一律以 `.rudder/README.md` 导航为准。
+>
 > **定位**：本文是 V6 整改的**最终定稿**，收敛自 `docs/v6-uparade.md` 的探索性整改计划。
 > 与 `v6-uparade.md` 冲突时，以本文为准；旧文档保留作历史，不再更新。
-> 逐文件的详细状态枚举仍以 `.rudder/lifecycle.md` 为权威，本文只给出结构与决策。
+> 逐文件的详细状态枚举现以 `.rudder/workflow/states.md` 为权威，本文只给出结构与决策。
 
 ## 一、核心原则
 
@@ -11,7 +17,7 @@
 | 层 | 回答 | 落点 |
 | -- | -- | -- |
 | Rules | 什么必须做 / 禁止做 | `.rudder/` |
-| Workflow | 当前状态 / 下一步去哪 | `.rudder/lifecycle.md` 状态机 |
+| Workflow | 当前状态 / 下一步去哪 | `.rudder/workflow/` 状态机 |
 | Skills | 某能力怎么做 | `skills/` 权威源 |
 | Agent | 谁执行 | Claude Code / Hermes |
 
@@ -21,7 +27,7 @@ Import / 分析 / 拆分 / 规划全程，AI 是**起草工具**，人是**主�
 
 ### 1.3 机器管结构，人管语义
 
-* 机器管：字段齐全、格式正确、可追溯（`check-import` / `check-tasks` 等确定性脚本）。
+* 机器管：字段齐全、格式正确、可追溯（`check-import` / `check-req` 等确定性脚本）。
 * 人管：拆得对不对、意图对不对、边界对不对（人工批准点）。
 
 ## 二、两条入口

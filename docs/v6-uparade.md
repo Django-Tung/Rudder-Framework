@@ -1,5 +1,31 @@
 ---
 
+> **⚠️ 历史文档，不再更新。** 本文是 V6 的**探索性**整改计划，已被 `docs/v6-design.md`
+> 收敛并落地。与本文冲突时，**以 `.rudder/` 与 `docs/v6-design.md` 为准**。
+>
+> ## 本文中已被**否决**的两处
+>
+> | 本文的说法 | 落地结论 |
+> |---|---|
+> | REQ 目录**只有 6 个文件**，`tasks.md` 不在 REQ 目录内（见 §「REQ 目录结构」，行 ~524） | **否决**。REQ 目录为 **7 个文件**，`tasks.md` 就在 REQ 目录内——它是 Commit 门禁的 I1/I2 断言对象，移出后门禁失去落点 |
+> | 状态枚举中**不出现** `OUTDATED` / `INVALIDATED`（全文未提及这两个值） | **否决**。二者是**需求变更专属失效态**，被逐字保留；`OUTDATED` 落在 `implement.md`，`INVALIDATED` 落在 `verify.md` / `review.md`。现行权威定义见 `.rudder/workflow/states.md` §1 |
+>
+> ## 本文中**三套互斥**的 IMP 状态枚举
+>
+> 本文在不同章节各写了一套 IMP 状态，彼此不一致——落地时**三套全部废弃**，
+> 改用 `.rudder/import/sources.md` §1 的四个小写值（`imported → analyzed → approved → archived`）：
+>
+> | 出处 | 本文的枚举 | 问题 |
+> |---|---|---|
+> | §「Import 完成判据」（行 ~330） | 一张勾选清单：原始文件存在 / 可解析 / 内容提取 / 编码正确 / 来源可追踪 / `imported.md` 已生成 / metadata 已生成 | 是**完成判据**而非状态机，无状态名、无法断言推进 |
+> | §十五 Workflow 状态机（行 ~812） | 单一平链 `IMPORTED → ANALYZED → **DECOMPOSED** → PLANNED → IMPLEMENTING → …` | 把 IMP 与 REQ 压成**一条链**；`DECOMPOSED` 落地时被删除（分析与拆分合并为一个步骤，不单独设状态） |
+> | §决策三（行 ~881） | `IMPORTED → ANALYZED → PLANNED → …` | 虽然合并了 `DECOMPOSED`，但**仍与 REQ 状态混在同一条链上**，且缺少 `approved`（人工批准点）与 `archived` |
+>
+> 落地后的 IMP 是**终止式管道**（无失败态、无回环），与本文的"平链"模型不同：
+> 详见 `.rudder/import/sources.md`、`openspec/changes/v6-requirement-lifecycle/specs/import-pipeline/spec.md`。
+
+---
+
 # Rudder-OS 工程体系整改计划
 
 **版本：V6.0**

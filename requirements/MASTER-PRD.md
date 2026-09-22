@@ -35,7 +35,10 @@ pending_maps: []
 > （如 `> 需同步更新 MASTER-PRD.md 的全局技术契约`），由归档脚本统一同步到本节，
 > **禁止 AI 直接覆写本节现有内容**。
 
-（暂无）
+| 编号 | 规则 | 来源 |
+|---|---|---|
+| BR-1 | 所有金额字段单位为人民币元 | IMP-20260922-001「供应商管理模块需求说明」§一 |
+| BR-2 | 所有时间字段统一使用 `YYYY-MM-DD` 格式 | IMP-20260922-001「供应商管理模块需求说明」§一 |
 
 ## 2. 术语表 (Glossary)
 
@@ -48,6 +51,8 @@ pending_maps: []
 <!-- BEGIN:AUTO-INDEX -->
 | 需求ID | 名称 | 状态 | Phase | 依赖 | 来源 | 路径 |
 |------|------|------|------|------|------|------|
+| REQ-001 | 供应商列表 | PLANNED | Plan | — | IMP-20260922-001 | REQ-001-supplier-list/ |
+| REQ-002 | 列表异常与重试入口 | PLANNED | Plan | — | IMP-20260922-001 | REQ-002-list-error-retry/ |
 <!-- END:AUTO-INDEX -->
 
 > 本索引由 `node scripts/sync-master-prd.js` 生成与更新；校验一致性用 `node scripts/sync-master-prd.js --check`。

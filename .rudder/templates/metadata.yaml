@@ -1,0 +1,23 @@
+# IMP 管道元数据模板
+# 字段规格见 .rudder/import/normalization.md §2
+# 状态取值见 .rudder/import/sources.md §1（只允许 4 个小写值，且单向推进）
+
+id: IMP-YYYYMMDD-NNN
+
+source:
+  # 输入类型：docx | md | txt
+  # PDF 与 xlsx 不受支持（Non-Goal，见 .rudder/import/sources.md §5）
+  type: docx
+  # 原文件名，不含路径
+  filename: [原文件名.docx]
+
+created_at: YYYY-MM-DD
+
+# imported | analyzed | approved | archived
+status: imported
+
+content:
+  # 归一化后的格式，目前恒为 markdown
+  format: markdown
+  # 相对 IMP 目录的归一化产物路径（用相对路径，避免归档移动后失效）
+  path: imported.md

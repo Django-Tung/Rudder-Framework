@@ -1,4 +1,4 @@
-# Rudder-OS V6 · 需求生命周期与规则体系（最终设计）
+# Rudder Framework V6 · 需求生命周期与规则体系（最终设计）
 
 > **⚠️ 本文已实现，现状请以 `.rudder/` 为准。**
 > 本文是 V6 整改的**设计记录**，其内容已由变更 `v6-requirement-lifecycle` 落地。

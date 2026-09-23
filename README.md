@@ -1,8 +1,8 @@
-# 🧭 Rudder OS 使用手册
+# 🧭 Rudder Framework 使用手册
 
 ## 1. 简介
 
-Rudder OS 是一个为 AI Agent（如 Claude Code, Hermes Agent）设计的结构化需求原型开发框架。它通过**严格的规则约束**、**标准化的文档模板**和**自动化的反馈闭环**，确保 AI 能够高质量、可追溯地交付纯前端 React 原型。
+Rudder Framework 是一个为 AI Agent（如 Claude Code, Hermes Agent）设计的结构化需求原型开发框架。它通过**严格的规则约束**、**标准化的文档模板**和**自动化的反馈闭环**，确保 AI 能够高质量、可追溯地交付纯前端 React 原型。
 
 第一次使用请先阅读[新手教程](docs/getting-started.md)，其中包含环境准备、依赖安装、开发服务器启动和第一个需求的完整示例。
 
@@ -383,7 +383,7 @@ AI 会更新 `plan.md`（含 Change Log）、退回 `DRAFT`，并级联失效下
 1. **让 AI 自己修 Bug**：当 AI 在 Implement 或 Verify 阶段写出有问题的代码时，**不要手动帮它修改**。指出问题或让它看报错日志，强制它触发自动修复闭环。
 2. **只看 `verify.md`，不听口头承诺**：如果 AI 在聊天中说"已经测试通过"，但 `verify.md` 中没有 `npm run build` 的 PASS 记录，视为未通过。
 3. **保持上下文隔离 (One REQ at a time)**：处理 `REQ-001` 时，绝对不要让它去修改 `REQ-002` 的代码。强制它完成当前需求的 Commit 后，再开启下一个需求。
-4. **严格遵循技术栈**：Rudder OS 的核心策略之一是防止 AI 引入重型库或自定义 CSS。发现违规应在 Review 阶段直接打回。
+4. **严格遵循技术栈**：Rudder Framework 的核心策略之一是防止 AI 引入重型库或自定义 CSS。发现违规应在 Review 阶段直接打回。
 5. **需求变更走协议，不要就地改**：直接让 AI"顺手加个功能"会绕过 AC，导致 Review 失去基准、归档证据失真。**已归档 (DONE) 的需求一律开新 REQ**。
 6. **状态用脚本校验，别只听汇报**：`npm run check:req`、`npm run check:skills`、`npm run sync:master -- --check` 都是确定性的。若 AI 声称"任务已全部完成"，但 `check:req` 退出码非 0，视为未完成。
 7. **依赖边要如实登记**：`deps` 漏登记不会让依赖消失，只会让上游变更时下游**静默失真**。依赖图越密 = 拆分质量越差，应尽量让每个 REQ 自洽。

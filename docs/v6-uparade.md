@@ -26,10 +26,10 @@
 
 ---
 
-# Rudder-OS 工程体系整改计划
+# Rudder Framework 工程体系整改计划
 
 **版本：V6.0**
-**目标版本：Rudder-OS V6**
+**目标版本：Rudder Framework V6**
 **整改类型：架构 / 流程 / Skills / Agent / 工程规范**
 **核心范围：`.rudder`、`skills`、Requirement Workflow、Claude Code**
 
@@ -37,7 +37,7 @@
 
 # 一、整改背景
 
-Rudder-OS 当前已经具备以下基础能力：
+Rudder Framework 当前已经具备以下基础能力：
 
 * `.rudder` 项目规则
 * Skills 技能体系
@@ -90,7 +90,7 @@ Decompose
 
 # 二、整改总体目标
 
-本次整改完成后，Rudder-OS 应形成以下完整生命周期：
+本次整改完成后，Rudder Framework 应形成以下完整生命周期：
 
 ```text
 ┌─────────────────────────────┐
@@ -261,7 +261,7 @@ Codex
 
 解决：
 
-> 用户上传的原始需求如何进入 Rudder-OS？
+> 用户上传的原始需求如何进入 Rudder Framework？
 
 Import 不负责理解需求，也不负责制定技术方案。
 
@@ -1415,7 +1415,7 @@ Commit
 
 这条链非常重要。
 
-它实际上是 Rudder-OS 的：
+它实际上是 Rudder Framework 的：
 
 > **Traceability Chain**
 
@@ -1695,10 +1695,10 @@ Commit
 
 # 二十五、最终目录
 
-整改完成后，我建议 Rudder-OS 最终形成：
+整改完成后，我建议 Rudder Framework 最终形成：
 
 ```text
-Rudder-OS/
+Rudder-Framework/
 │
 ├── .rudder/
 │   ├── README.md
@@ -1755,7 +1755,7 @@ Rudder-OS/
 
 # 二十六、整改后的最终模型
 
-整个 Rudder-OS 最终可以浓缩成下面这套模型：
+整个 Rudder Framework 最终可以浓缩成下面这套模型：
 
 ```text
                  ┌────────────────┐

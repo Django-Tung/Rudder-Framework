@@ -53,7 +53,7 @@ created: YYYY-MM-DD
     - 在 `<RecentActivityTable />` 的表头，预留 `<ColumnFilter />` 组件位置。
 
 ## 4. UI/UX 与状态规范 (UI/UX & State Specifications)
-> 🚨 **Rudder-OS 强制约束**：AI 必须处理以下所有 UI 状态，且所有面向用户的文案**必须为简体中文**。
+> 🚨 **Rudder Framework 强制约束**：AI 必须处理以下所有 UI 状态，且所有面向用户的文案**必须为简体中文**。
 
 - **Loading 状态**：[描述加载时的 UI 表现，如：骨架屏 / 按钮 Spin / 全局遮罩]
 - **Empty 状态**：[描述无数据时的 UI 表现及引导文案]
@@ -62,7 +62,7 @@ created: YYYY-MM-DD
 - **响应式要求**：[如：移动端优先，断点设置在 768px]
 
 ## 5. 技术契约与数据模型 (Technical Contract & Data Models)
-> 🚨 **Rudder-OS 强制约束**：严格遵守技术栈 (React 19 + TS strict + Tailwind v4 + Zustand)。禁止引入未授权的第三方 UI 库。
+> 🚨 **Rudder Framework 强制约束**：严格遵守技术栈 (React 19 + TS strict + Tailwind v4 + Zustand)。禁止引入未授权的第三方 UI 库。
 
 ### 5.1 核心数据结构 (TypeScript Interfaces)
 ```typescript

@@ -18,6 +18,8 @@ hermes:
 ## Goal
 Import an external requirement document, normalize it, roughly split it into candidate feature points, and — after human approval of the split — produce REQ skeletons. Detailed product and technical design belongs to `/rudder-plan`.
 
+`requirements/MASTER-PRD.md` is the project-level main record. If it does not exist, create it from the project template before continuing. This command must confirm the project's primary UI style and resolve all material ambiguities with the human before writing the analyzed result or creating REQ directories.
+
 <!-- hermes-only:start -->
 ## Parameter Extraction
 Extract the document path from the user's natural language input (e.g., "导入 ./docs/req.docx" -> `./docs/req.docx`).
@@ -25,24 +27,26 @@ If the path is missing, **MUST ask the user in Chinese** to provide it. **NEVER 
 <!-- hermes-only:end -->
 
 ## Execution Steps
-1. **Convert** (`imported`): Run `node scripts/import-docx.js <path>`. Parsing is a deterministic script's job — **NEVER** read the binary `.docx` or parse its XML yourself. Then create `requirements/IMP-YYYYMMDD-NNN/` and materialize:
+1. **Initialize Main Record**: Ensure `requirements/MASTER-PRD.md` exists. If absent, create it with the sections for UI primary style, global business rules, terminology, pending maps, and the `AUTO-INDEX` block. Read the existing confirmed UI style before analyzing a new document.
+2. **Convert** (`imported`): Run `node scripts/import-docx.js <path>`. Parsing is a deterministic script's job — **NEVER** read the binary `.docx` or parse its XML yourself. Then create `requirements/IMP-YYYYMMDD-NNN/` and materialize:
    - `source/` — the untouched original file (verbatim, no conversion)
    - `imported.md` — the normalized Markdown
    - `metadata.yaml` — MUST carry `id`, `source.type`, `source.filename`, `created_at`, `status: imported`, `content.format`, `content.path`
-2. **Read Roughly & Split** (`analyzed`): Read only `imported.md` (and `MASTER-PRD.md`, which the import stage is explicitly allowed to read). Produce a lightweight `analysis.md` with a document overview, candidate feature points, clearly stated shared rules and terms, explicit dependencies, and optional open questions. Then append a `pending_maps` entry (`status: DRAFT`) to `requirements/MASTER-PRD.md`:
+3. **Confirm UI Style and Ambiguities — MANDATORY**: Before finalizing `analysis.md` or appending `pending_maps`, show the current UI primary style. If it is `UNCONFIRMED`, ask the human to choose or describe one (for example: data-dense workbench, lightweight content-oriented, brand-led, or custom). If it is already confirmed, ask whether to reuse it or adjust it for this project. Ask every material business clarification question discovered during import in Chinese. **Do not guess, do not continue, and do not write a formal split until the human answers.** Record the confirmed style and confirmed cross-REQ rules/terms in `requirements/MASTER-PRD.md`.
+4. **Read Roughly & Split** (`analyzed`): Read only `imported.md` (and `MASTER-PRD.md`, which the import stage is explicitly allowed to read). Produce a lightweight `analysis.md` with a document overview, candidate feature points, clearly stated shared rules and terms, explicit dependencies, and optional open questions. Then append a `pending_maps` entry (`status: DRAFT`) to `requirements/MASTER-PRD.md`:
    - **Global Rules / Terms** stay out of the split — they belong to the 「全局业务规则 / 术语表」 sections of `MASTER-PRD.md`.
    - **Independent Features** become `requirements` items, each with `id` / `title` / `priority` / `dependencies`.
   - Do **not** write ACs, page structures, UI states, data models, service contracts, or implementation tasks.
   - If a passage cannot be classified, mark it as `待 Plan 确认` and record an open question. **NEVER guess or hallucinate business logic.**
    - The analysis stage and the split stage are merged into this one step, but the artifacts remain two: `analysis.md` (human-facing) and `pending_maps` (machine-facing). There is no `DECOMPOSED` state.
    - Then run `node scripts/check-import.js requirements/IMP-YYYYMMDD-NNN`. Exit code **MUST** be 0.
-3. **⏸ PAUSE FOR HUMAN CONFIRMATION — MANDATORY**: This step is an **internal pause inside this command, not a separate command**. Stop and present the split result to the user (REQ list with titles and dependency relations), and ask for approval **in Chinese**. **MUST NOT create any REQ directory before the human replies.** This is the first approval point of Path A, mirroring how `/rudder-plan` waits for "PRD 批准".
-4. **Approve & Materialize** (`approved`): Only after the human confirms the split:
+5. **⏸ PAUSE FOR HUMAN CONFIRMATION — MANDATORY**: This step is an **internal pause inside this command, not a separate command**. Stop and present the split result to the user (REQ list with titles and dependency relations), and ask for approval **in Chinese**. **MUST NOT create any REQ directory before the human replies.** This is the first approval point of Path A, mirroring how `/rudder-plan` waits for "PRD 批准".
+6. **Approve & Materialize** (`approved`): Only after the human confirms the split:
    - Set that `pending_maps` entry's `status` to `APPROVED`.
    - Create `requirements/REQ-XXX-<kebab-name>/` for **each** REQ in the entry, with all **7** artifacts (`README.md`, `plan.md`, `tasks.md`, `implement.md`, `verify.md`, `review.md`, `commit.md`). `README.md` starts at `status: PLANNED` / `stale: false`, `plan.md` at `status: DRAFT`.
    - Set the IMP's `metadata.yaml.status` to `approved`.
    - Immediately **remove** that `pending_maps` entry — the REQ is now carried by `AUTO-INDEX`, and must never be registered in two places.
-5. **Report to User**: Output the rough feature tree, known dependencies, and open questions. After approval, tell the user to run `/rudder-plan REQ-XXX` for each created REQ.
+7. **Report to User**: Output the confirmed UI primary style, rough feature tree, known dependencies, and remaining open questions. After approval, tell the user to run `/rudder-plan REQ-XXX` for each created REQ.
 
 ## Pipeline Rules
 - The 4 states are **strictly one-way**. An `approved` IMP **MUST NOT** fall back to `analyzed` or `imported`; re-importing means creating a **new** IMP directory.
@@ -55,4 +59,5 @@ If the path is missing, **MUST ask the user in Chinese** to provide it. **NEVER 
 - **User Interaction**: ALL questions, reports, and the approval prompt to the user **MUST be in Chinese (中文)**.
   - *Required Approval Prompt*: "文档已粗略读取并拆分为功能点，请确认拆分结果。确认无误后，请回复：**拆分批准，创建 REQ 目录**。"
 - **Business Content**: Extracted business logic, requirement trees, and clarification questions **MUST be in Chinese**.
+- **UI Style Confirmation**: The primary UI style is a human-approved project decision recorded in `MASTER-PRD.md`; never infer it from the source document or silently choose one.
 - **System/Paths**: File paths, YAML keys, and structural markers remain in English.

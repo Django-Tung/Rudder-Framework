@@ -108,6 +108,8 @@ project/
 
 ### 路径 A：批量导入（IMP 管道）
 
+首次执行 `/rudder-import` 时，如果 `requirements/MASTER-PRD.md` 不存在，必须先创建项目主记录。入口会先让用户确认项目 UI 主风格，并确认所有影响拆分的歧义；后续导入会展示当前主风格，用户确认沿用或调整后才能继续。
+
 IMP 是**终止式管道**——4 个顺序状态、无失败态、无回环：
 
 ```text
@@ -143,6 +145,8 @@ imported ──[粗读+拆分]──► analyzed ──[人工确认]──► a
 > `requirements/_inbox/` 已降级为临时暂存，仅保留 `fixtures/`，**不再承载任何管道产物**。
 
 ### 路径 B：人工登记
+
+首次执行 `/rudder-plan` 同样必须先确保 `requirements/MASTER-PRD.md` 存在，并由用户确认项目 UI 主风格。业务范围、边界、依赖和 UI 行为存在不明确时，必须先提问并等待回答，不能猜测后直接生成正式 `plan.md`。
 
 直接创建 `requirements/REQ-XXX-<kebab-name>/` 与 7 个产物文件，`deps` 由**人工确认**，
 不经过 `pending_maps`。

@@ -45,6 +45,12 @@
 3. **等待人工回答**后再继续拆分。
 4. `analysis.md` 的「待 Plan 确认」按需记录问题；详细澄清在 `/rudder-plan` 阶段完成。
 
+### 3.1 UI 主风格确认
+
+`/rudder-import` 是项目的批量入口，`/rudder-plan` 是项目的增量入口；两者首次运行都必须确认项目级 UI 主风格，并记录到 `requirements/MASTER-PRD.md`。后续运行必须展示当前风格并由人确认沿用或调整。
+
+UI 主风格属于项目级决策，不得由 Agent 根据需求文档自行推断。没有人工确认时，入口只能提出选项和问题，不能写入正式 `analysis.md`、`pending_maps` 或完整 `plan.md`。
+
 ## 4. 拆分产物写入 `pending_maps`
 
 拆分结论写入 `requirements/MASTER-PRD.md` frontmatter 的 `pending_maps` 字段（**列表**）：

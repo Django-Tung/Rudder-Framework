@@ -8,7 +8,7 @@
 
 | 阶段 | 进入本阶段的前置条件 | 本阶段产出的状态 |
 |------|---------------------|-----------------|
-| Plan | 依赖方 `plan.md` = `APPROVED`（路径 A 另需拆分已 `APPROVED`） | `plan.md` = `DRAFT` → `APPROVED` |
+| Plan | `MASTER-PRD.md` 已存在且 UI 主风格已人工确认；所有重大澄清问题已回答；依赖方 `plan.md` = `APPROVED`（路径 A 另需拆分已 `APPROVED`） | `plan.md` = `DRAFT` → `APPROVED` |
 | Tasks | `plan.md` = `APPROVED` | `tasks.md` = `DRAFT` → `READY` |
 | Implement | `plan.md` = `APPROVED` ∧ `tasks.md` = `READY` | `implement.md` = `IN_PROGRESS` → `COMPLETED` |
 | Verify | `implement.md` = `COMPLETED` | `verify.md` = `PASS` 或 `FAIL` |
@@ -62,7 +62,7 @@ REQ 真正依赖的是依赖方「**定下来要做什么**」——即 `plan.md
 
 Plan → Commit 窗口内，Agent **仅允许**读取 `requirements/MASTER-PRD.md` 与当前 REQ 目录。
 
-**导入阶段例外**：导入必须同时读取外部待导入文档与 `MASTER-PRD.md` 才能判定全局/局部，
+**导入阶段例外**：导入必须同时读取外部待导入文档与 `MASTER-PRD.md` 才能判定全局/局部；首次导入若主文档不存在，必须先创建并确认 UI 主风格，
 故不在该约束内。见 [`../import/sources.md`](../import/sources.md) §4。
 
 ## 5. 机器门禁（确定性脚本）

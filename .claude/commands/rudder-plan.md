@@ -12,23 +12,30 @@ argument-hint: [REQ-ID or Description]
 ## Goal
 Transform a vague idea or a rough feature skeleton into the detailed, contract-first PRD (`plan.md`) that defines scope, Acceptance Criteria (AC), Page Structure, and technical contracts.
 
+`requirements/MASTER-PRD.md` is the project-level main record. On the first `/rudder-plan` invocation, create it if missing. Before creating or completing a PRD, this command must confirm the project's primary UI style and resolve all material ambiguities with the human.
+
 ## Execution Steps
-1. **Context Loading**:
+1. **Initialize Main Record and Confirm UI Style**:
+  - Ensure `requirements/MASTER-PRD.md` exists. If absent, create it with the sections for UI primary style, global business rules, terminology, pending maps, and the `AUTO-INDEX` block.
+  - Show the current UI primary style. If it is `UNCONFIRMED`, ask the human to choose or describe one (for example: data-dense workbench, lightweight content-oriented, brand-led, or custom). If it is already confirmed, ask whether to reuse it or adjust it for this project. Record the human-confirmed style in `MASTER-PRD.md` before writing `plan.md`.
+  - Ask every material clarification question about business rules, scope, actors, edge cases, dependencies, and UI behavior in Chinese. **Do not guess or fill gaps. Do not create or complete the formal PRD until the human answers.** Record confirmed cross-REQ rules and terminology in `MASTER-PRD.md`.
+2. **Context Loading**:
   - If user provides `REQ-XXX`: Read the existing skeleton at `requirements/REQ-XXX-xxx/plan.md`, the matching rough analysis, and the matching `pending_maps` entry in `requirements/MASTER-PRD.md`. **FORBIDDEN to re-read the lengthy raw imported document** (`requirements/IMP-*/imported.md`).
    - If user provides a new description (Path B, manual registration): create a new `REQ-XXX-<kebab-name>/` directory holding all **7** artifacts. `README.md` must carry `id` / `title` / `status: PLANNED` / `deps` / `stale: false`, with `deps` **confirmed by the human, never guessed**.
-2. **Dependency Gate**: For every REQ listed in `deps`, confirm its `plan.md` status is `APPROVED`. If any dependency is still `DRAFT`, **STOP** and report the blocking dependency together with its current status. Do **NOT** advance. (Path A additionally requires the split to be already `APPROVED`.)
-3. **Clarify First**:
+3. **Dependency Gate**: For every REQ listed in `deps`, confirm its `plan.md` status is `APPROVED`. If any dependency is still `DRAFT`, **STOP** and report the blocking dependency together with its current status. Do **NOT** advance. (Path A additionally requires the split to be already `APPROVED`.)
+4. **Clarify First**:
   - Treat Import output as candidate scope only. Ask clarification questions for missing business logic, edge cases, or acceptance boundaries before writing the detailed PRD.
   - **NEVER guess or complete** business logic, edge cases, or ACs before the user explicitly answers.
-4. **Elaborate**:
+5. **Elaborate**:
    - After user clarification, complete the `plan.md` skeleton into a full PRD. It **MUST** include:
      - **Business Background & Non-Goals**
      - **User Stories & Scenarios**
      - **BDD Acceptance Criteria**: Strictly numbered as `AC-1`, `AC-2` (required for `check-req` validation).
      - 📐 **Page Structure & Component Skeleton**: Use nested lists or simple ASCII diagrams to define core layout areas and React component hierarchy. No CSS needed, but layout intent must be clear.
      - **UI/UX Tri-state Specs** (Loading / Empty / Error)
+    - **Primary UI Style**: The confirmed project style from `MASTER-PRD.md`, plus any REQ-specific exception and its reason.
      - **Tech Contract & Data Model** (Zustand Store, Mock Schema)
-5. **Gate**:
+6. **Gate**:
    - Set `plan.md` `status` to `DRAFT`, and sync `README.md` `status` to `PLANNED` (derived value, see `.rudder/workflow/states.md`).
    - Present the core PRD (especially Page Structure) to the user.
 
@@ -36,3 +43,4 @@ Transform a vague idea or a rough feature skeleton into the detailed, contract-f
 - **User Interaction**: ALL clarification questions and the final approval prompt **MUST be in Chinese**.
   - *Required Approval Prompt*: "请 Review。确认无误后，请回复：**PRD 批准，状态改为 APPROVED**"
 - **Business Content**: The entire content of `plan.md` (Background, Stories, ACs, Page Structure) **MUST be written in Chinese**. Technical terms, component names, and YAML keys can remain in English.
+- **UI Style Confirmation**: The primary UI style must be confirmed by the human and recorded in `MASTER-PRD.md`; it must not be inferred or silently selected by the Agent.

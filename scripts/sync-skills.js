@@ -5,7 +5,7 @@
  * 投影一：`.claude/commands/rudder-<name>.md`
  * 投影二：`.hermes/skills/rudder-<name>/SKILL.md`
  *
- * 渲染规则（详见 openspec/changes/v6-requirement-lifecycle/specs/skill-single-source）：
+ * 渲染规则由本脚本和 skills/ 下的权威源共同定义：
  * - frontmatter 两段展开：`claude:` 段 → Claude 投影，`hermes:` 段 → Hermes 投影。
  * - 标题按 runtime 区分：`# Command: rudder-<name>` / `# Skill: rudder-<name>`。
  * - `<!-- hermes-only:start -->` / `<!-- hermes-only:end -->` 包裹的区块只进 Hermes 投影。

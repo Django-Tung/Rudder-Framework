@@ -14,13 +14,6 @@ pnpm-debug.log*
 
 # 本机私有配置（不入库，各人本地权限不同）
 .claude/settings.local.json
-# OpenSpec 工作区与 opsx 命令按本机工具处理，不入库
-openspec
-opsx
-openspec-*
-# 例外：框架级说明文档必须入库（见 docs/openspec-usage.md）
-!docs/openspec-usage.md
-
 # 编辑器与系统
 .vscode/*
 !.vscode/extensions.json

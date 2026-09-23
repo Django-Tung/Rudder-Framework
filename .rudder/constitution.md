@@ -71,7 +71,7 @@
 - 直接改投影文件属于违规——即使内容"看起来对"，下次生成也会被覆盖。
 
 > 详细渲染规则（两段式 frontmatter、标题形态、`hermes-only` 区块）见
-> `openspec/changes/*/specs/skill-single-source/spec.md` 与 `scripts/sync-skills.js` 的实现。
+> `scripts/sync-skills.js` 的实现。
 
 ## 7. 📄 文档格式支持边界
 

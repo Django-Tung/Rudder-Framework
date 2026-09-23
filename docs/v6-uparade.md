@@ -22,7 +22,7 @@
 > | §决策三（行 ~881） | `IMPORTED → ANALYZED → PLANNED → …` | 虽然合并了 `DECOMPOSED`，但**仍与 REQ 状态混在同一条链上**，且缺少 `approved`（人工批准点）与 `archived` |
 >
 > 落地后的 IMP 是**终止式管道**（无失败态、无回环），与本文的"平链"模型不同：
-> 详见 `.rudder/import/sources.md`、`openspec/changes/v6-requirement-lifecycle/specs/import-pipeline/spec.md`。
+> 详见 `.rudder/import/sources.md`。
 
 ---
 

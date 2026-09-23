@@ -3,6 +3,11 @@ id: REQ-XXX
 status: PENDING
 phase: commit
 created: ""
+# 归档字段（Archive 不单独成文件，见 .rudder/workflow/states.md §1.6）
+# 初始为未归档；归档时回填为 true / <YYYY-MM-DD> / requirements/archive/<YYYY-MM>-REQ-XXX-<kebab-name>/
+archived: false
+archived_at: ""
+archive_path: ""
 ---
 
 # 提交记录: [需求名称]

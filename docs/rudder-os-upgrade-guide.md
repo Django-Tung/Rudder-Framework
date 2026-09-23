@@ -1,5 +1,10 @@
 # Rudder-OS 架构升级与工程化优化实施指南（修订版 v2.0）
 
+> **⚠️ 历史文档，不再更新。** 本文记录的是上一轮（V2.0）的整改内容，
+> 其中对 `.rudder/lifecycle.md` 的引用已在 V6 整改中失效——
+> 该文件已拆分至 `.rudder/workflow/{lifecycle,states,gates,transitions}.md`。
+> 规则现状以 `.rudder/README.md` 导航为准；V6 的设计与落地见 `docs/v6-design.md` 与 `openspec/`。
+
 **文档版本**：v2.0（取代 v1.1）
 **修订日期**：2026-09-21
 **修订方**：系统架构规划组

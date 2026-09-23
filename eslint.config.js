@@ -34,7 +34,7 @@ export default tseslint.config(
       globals: { ...globals.browser, ...globals.node },
     },
     rules: {
-      // ---- Rudder 工程策略（见 .rudder/policies/core.md）----
+      // ---- Rudder 工程策略（见 .rudder/constitution.md）----
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',
       // 提交前必须清理调试语句，故设为 error 而非 warn，

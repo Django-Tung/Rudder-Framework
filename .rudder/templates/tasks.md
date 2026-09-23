@@ -9,7 +9,7 @@ created: ""
 
 > 本文件是 Implement 阶段的执行进度清单，由 AI 依据 `plan.md` 拆解，并在实施过程中实时勾选。
 > **status 由勾选状态推导**：`DRAFT`（未拆解）| `READY`（已拆解，存在未勾选项）| `DONE`（全部勾选）。
-> `scripts/check-tasks.js` 断言 status 与勾选一致（防"先勾完再写代码"）。
+> `scripts/check-req.js` 断言 status 与勾选一致（防"先勾完再写代码"）。
 
 ## 状态 (Status)
 
@@ -17,7 +17,7 @@ READY
 
 ## 任务拆解 (Task Breakdown)
 
-> 每条任务须标注对应验收标准编号（如 AC-1），`check-tasks.js` 断言每条 AC 至少被一条任务覆盖（不变量 I1）。
+> 每条任务须标注对应验收标准编号（如 AC-1），`check-req.js` 断言每条 AC 至少被一条任务覆盖（不变量 I1）。
 > 分类（Types/Mocks/Services/UI）按 Contract-First 顺序；若需求无 UI，则省略 UI 分类并在此注明。
 
 ### 类型定义 (Types)
@@ -38,4 +38,4 @@ READY
 
 ## 门控 (Gate)
 
-- 进入 Commit 前：`status` = `DONE`（无未勾选项，`check-tasks.js` 断言不变量 I2）
+- 进入 Commit 前：`status` = `DONE`（无未勾选项，`check-req.js` 断言不变量 I2）

@@ -1,0 +1,43 @@
+---
+claude:
+  description: Handle scope creep by updating PRD, invalidating downstream evidence, and freezing code.
+  argument-hint: [REQ-ID] [Change Description]
+hermes:
+  name: rudder-change
+  description: Handle scope creep by updating PRD, invalidating downstream evidence, and freezing code.
+  triggers:
+    - 需求变更 REQ-
+    - 修改需求 REQ-
+    - rudder-change
+    - 加个功能 REQ-
+    - 变更需求
+---
+
+> This is a **control protocol** inserted into Plan/Implement, not a phase. Rules: `.rudder/workflow/transitions.md` §4.4.
+
+## Goal
+Handle scope creep by updating the PRD, invalidating downstream evidence, and freezing code until human re-approval.
+
+<!-- hermes-only:start -->
+## Parameter Extraction
+Extract the target REQ-ID and the description of the change from user input. If missing, **MUST ask in Chinese**.
+<!-- hermes-only:end -->
+
+## Execution Steps
+1. **Update Plan**: Update User Stories / AC in `plan.md`. Append or update `## 📝 Change Log` at the end of the file. Every entry **MUST** record all four elements: **日期 (date) / 内容 (content) / 原因 (reason) / 影响范围 (impact scope)**.
+2. **Cascade Invalidation** (contract changed, so all downstream evidence is void). Reset each file explicitly:
+   - `plan.md` -> `DRAFT` (awaiting human re-approval)
+   - `tasks.md` -> `DRAFT` (old task breakdown must be redone)
+   - `implement.md` -> `OUTDATED` (clear the core implementation summary)
+   - `verify.md` -> `INVALIDATED` (clear the verification log)
+   - `review.md` -> `INVALIDATED` (clear the review record)
+   - `README.md` -> `status: IMPLEMENTING` (derived value, see `.rudder/workflow/states.md`)
+3. **Code Freeze**:
+   - **STRICT CONSTRAINT**: **FORBIDDEN** to modify any code under `src/` before the user replies "PRD 批准".
+4. **Report**: Inform the user that changes are logged, downstream evidence is invalidated, and code is frozen.
+5. **Propagate Cross-REQ (only after the contract is confirmed truly affected)**: Compute the dependents of this REQ from the `依赖` column of `MASTER-PRD.md`'s `AUTO-INDEX`, and mark each of them `stale: true` with `stale_reason` (this REQ's ID) and `stale_since`. Marking is machine work; **the judgement of whether each dependent is truly affected belongs to the human**, one hop at a time. The Agent **MUST NOT** clear a `STALE` flag on its own.
+
+## 🗣️ Interaction & Output Constraints (STRICT)
+- **Change Log**: The content of the `Change Log` in `plan.md` **MUST be written in Chinese**.
+- **User Interaction**: The report informing the user about the freeze and requesting re-approval **MUST be in Chinese**.
+  - *Required Prompt*: "需求变更已记录，下游证据已级联失效，代码已冻结。请 Review 新的 plan.md。确认无误后，请回复：**PRD 批准，状态改为 APPROVED** 以解冻代码。"

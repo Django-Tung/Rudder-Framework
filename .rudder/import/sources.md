@@ -8,7 +8,7 @@
 IMP（Import）是**终止式管道**，不是状态机——**4 个顺序状态、无失败态、无回环**：
 
 ```text
-imported ──[分析+拆分]──► analyzed ──[人工确认]──► approved ──[归档]──► archived
+imported ──[粗读+拆分]──► analyzed ──[人工确认]──► approved ──[归档]──► archived
 ```
 
 | 状态 | 达成条件 | 落盘 |

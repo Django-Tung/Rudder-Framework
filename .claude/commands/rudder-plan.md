@@ -1,5 +1,5 @@
 ---
-description: Elaborate a skeleton or user input into a structured PRD (plan.md) with AC and Page Structure.
+description: Turn a requirement skeleton or user input into a detailed PRD (plan.md) with AC, Page Structure, and technical contracts.
 argument-hint: [REQ-ID or Description]
 ---
 
@@ -10,16 +10,16 @@ argument-hint: [REQ-ID or Description]
 > This is **Phase 1 (Plan)** of the requirement lifecycle, strictly following `.rudder/workflow/lifecycle.md`.
 
 ## Goal
-Transform a vague idea or a pre-built skeleton into a structured, contract-first PRD (`plan.md`) with clear Acceptance Criteria (AC) and a high-level Page Structure.
+Transform a vague idea or a rough feature skeleton into the detailed, contract-first PRD (`plan.md`) that defines scope, Acceptance Criteria (AC), Page Structure, and technical contracts.
 
 ## Execution Steps
 1. **Context Loading**:
-   - If user provides `REQ-XXX`: Read the existing skeleton at `requirements/REQ-XXX-xxx/plan.md` and the matching `pending_maps` entry in `requirements/MASTER-PRD.md`. **FORBIDDEN to re-read the lengthy raw imported document** (`requirements/IMP-*/imported.md`).
+  - If user provides `REQ-XXX`: Read the existing skeleton at `requirements/REQ-XXX-xxx/plan.md`, the matching rough analysis, and the matching `pending_maps` entry in `requirements/MASTER-PRD.md`. **FORBIDDEN to re-read the lengthy raw imported document** (`requirements/IMP-*/imported.md`).
    - If user provides a new description (Path B, manual registration): create a new `REQ-XXX-<kebab-name>/` directory holding all **7** artifacts. `README.md` must carry `id` / `title` / `status: PLANNED` / `deps` / `stale: false`, with `deps` **confirmed by the human, never guessed**.
 2. **Dependency Gate**: For every REQ listed in `deps`, confirm its `plan.md` status is `APPROVED`. If any dependency is still `DRAFT`, **STOP** and report the blocking dependency together with its current status. Do **NOT** advance. (Path A additionally requires the split to be already `APPROVED`.)
 3. **Clarify First**:
-   - Check the "Completeness" of the corresponding `analysis.md`. If "Medium" or "Low", **MUST ask clarification questions first**.
-   - **NEVER guess or complete** business logic, edge cases, or ACs before the user explicitly answers.
+  - Treat Import output as candidate scope only. Ask clarification questions for missing business logic, edge cases, or acceptance boundaries before writing the detailed PRD.
+  - **NEVER guess or complete** business logic, edge cases, or ACs before the user explicitly answers.
 4. **Elaborate**:
    - After user clarification, complete the `plan.md` skeleton into a full PRD. It **MUST** include:
      - **Business Background & Non-Goals**

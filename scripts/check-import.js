@@ -6,9 +6,9 @@
  *      （`id` / `source.type` / `source.filename` / `created_at` / `status` / `content.format` / `content.path`）；
  *   2. `status` 取值合法（`imported` / `analyzed` / `approved` / `archived`）；
  *   3. `status` ∈ {analyzed, approved, archived} 时 `analysis.md` 必须存在，
- *      且含**非空**「澄清问题清单」（条目数 ≥ 1）。
+ *      且包含粗拆分所需的「文档概览」和「候选功能点」章节。
  *
- * 传入单文件（旧的导入报告路径）时，只做第 3 条的澄清问题断言，保持向后可用。
+ * 传入单文件（旧的导入报告路径）时，只做第 3 条的粗拆分断言，保持向后可用。
  *
  * 用法：node scripts/check-import.js <IMP 目录 | 报告文件>
  */
@@ -64,8 +64,8 @@ function get(obj, dotted) {
   return dotted.split('.').reduce((acc, k) => (acc == null ? undefined : acc[k]), obj);
 }
 
-/** 统计「澄清问题清单」章节内的列表项数（直到遇到同级或更高级标题为止）。 */
-function countClarifications(text) {
+/** 统计指定章节内的列表项数（直到遇到同级或更高级标题为止）。 */
+function countSectionItems(text, sectionPattern) {
   const lines = text.split('\n');
   let inSection = false;
   let sectionLevel = 0;
@@ -74,7 +74,7 @@ function countClarifications(text) {
     const h = line.match(/^(#+)\s+/);
     if (h) {
       if (inSection && h[1].length <= sectionLevel) break;
-      if (/澄清问题/.test(line)) {
+      if (sectionPattern.test(line)) {
         inSection = true;
         sectionLevel = h[1].length;
       }
@@ -85,12 +85,16 @@ function countClarifications(text) {
   return count;
 }
 
-/** 断言文本含非空「澄清问题清单」章节，返回是否通过。 */
-function assertClarifications(text, label) {
-  const hasSection = /澄清问题清单/.test(text);
-  const n = countClarifications(text);
-  const ok = hasSection && n >= 1;
-  console.log(`  ${ok ? '✅' : '❌'} ${label} 澄清问题清单：章节${hasSection ? '存在' : '缺失'}、条目数 ${n}`);
+/** 断言文本含有粗拆分所需章节，返回是否通过。 */
+function assertRoughAnalysis(text, label) {
+  const hasOverview = /文档概览/.test(text);
+  const hasFeatures = /候选功能点/.test(text);
+  const featureCount = countSectionItems(text, /候选功能点/);
+  const ok = hasOverview && hasFeatures && featureCount >= 1;
+  console.log(
+    `  ${ok ? '✅' : '❌'} ${label} 粗拆分结构：文档概览${hasOverview ? '存在' : '缺失'}、` +
+      `候选功能点${hasFeatures ? '存在' : '缺失'}、条目数 ${featureCount}`,
+  );
   return ok;
 }
 
@@ -132,8 +136,8 @@ function checkImpDir(dir) {
       console.error(`❌ 缺少 analysis.md: ${analysisPath}`);
     } else {
       console.log('✅ analysis.md 存在');
-      if (!assertClarifications(readFileSync(analysisPath, 'utf8'), 'analysis.md')) {
-        problems.push('analysis.md 的澄清问题清单为空');
+      if (!assertRoughAnalysis(readFileSync(analysisPath, 'utf8'), 'analysis.md')) {
+        problems.push('analysis.md 缺少粗拆分所需的文档概览或候选功能点');
       }
     }
   } else {
@@ -158,7 +162,7 @@ function main() {
 
   const ok = statSync(target).isDirectory()
     ? checkImpDir(target)
-    : assertClarifications(readFileSync(target, 'utf8'), target);
+    : assertRoughAnalysis(readFileSync(target, 'utf8'), target);
 
   console.log(`结论: ${ok ? '✅ 通过' : '❌ 未通过'}`);
   process.exitCode = ok ? 0 : 1;

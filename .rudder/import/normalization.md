@@ -12,7 +12,7 @@
 | `source/` | `imported` | 原件留痕，**只读** |
 | `imported.md` | `imported` | 归一化 Markdown，由脚本产出 |
 | `metadata.yaml` | `imported` | 管道状态与来源元数据 |
-| `analysis.md` | `analyzed` | 语义分析产物，规格见 [`../analysis/analysis.md`](../analysis/analysis.md) |
+| `analysis.md` | `analyzed` | 粗拆分产物，规格见 [`../analysis/analysis.md`](../analysis/analysis.md) |
 
 > 「拆分」不单独落文件——结果写入 `MASTER-PRD.md` 的 `pending_maps` 字段。
 > 其中 `analysis.md` 人读、`pending_maps` 机器读，二者同时产生（步骤合并、产物两个）。

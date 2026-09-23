@@ -1,5 +1,5 @@
 ---
-description: Import external docs, normalize, analyze and split into REQ entries, then await human approval.
+description: Import external docs, normalize and roughly split them into feature points, then await human approval.
 argument-hint: [Document Path]
 ---
 
@@ -10,18 +10,18 @@ argument-hint: [Document Path]
 > This is the **IMP pipeline** (`imported -> analyzed -> approved -> archived`), a terminal pipeline outside the requirement state machine. Rules: `.rudder/import/`, `.rudder/analysis/`.
 
 ## Goal
-Import an external requirement document, normalize it, analyze it into "global rules + independent features", and — after human approval of the split — produce the REQ skeletons in one atomic step.
+Import an external requirement document, normalize it, roughly split it into candidate feature points, and — after human approval of the split — produce REQ skeletons. Detailed product and technical design belongs to `/rudder-plan`.
 
 ## Execution Steps
 1. **Convert** (`imported`): Run `node scripts/import-docx.js <path>`. Parsing is a deterministic script's job — **NEVER** read the binary `.docx` or parse its XML yourself. Then create `requirements/IMP-YYYYMMDD-NNN/` and materialize:
    - `source/` — the untouched original file (verbatim, no conversion)
    - `imported.md` — the normalized Markdown
    - `metadata.yaml` — MUST carry `id`, `source.type`, `source.filename`, `created_at`, `status: imported`, `content.format`, `content.path`
-2. **Analyze & Split** (`analyzed`): Read only `imported.md` (and `MASTER-PRD.md`, which the import stage is explicitly allowed to read). Produce `analysis.md` with all 9 sections: `Business Goal`, `Actors`, `Functional Requirements`, `Business Rules`, `Non-functional Requirements`, `Dependencies`, `Constraints`, `Ambiguities`, `Risks`. Then append a `pending_maps` entry (`status: DRAFT`) to `requirements/MASTER-PRD.md`:
+2. **Read Roughly & Split** (`analyzed`): Read only `imported.md` (and `MASTER-PRD.md`, which the import stage is explicitly allowed to read). Produce a lightweight `analysis.md` with a document overview, candidate feature points, clearly stated shared rules and terms, explicit dependencies, and optional open questions. Then append a `pending_maps` entry (`status: DRAFT`) to `requirements/MASTER-PRD.md`:
    - **Global Rules / Terms** stay out of the split — they belong to the 「全局业务规则 / 术语表」 sections of `MASTER-PRD.md`.
    - **Independent Features** become `requirements` items, each with `id` / `title` / `priority` / `dependencies`.
-   - `analysis.md` MUST contain a **non-empty 「澄清问题清单」 with at least 1 entry**. **NEVER guess or hallucinate business logic.**
-   - If a passage cannot be classified as global rule vs. independent feature, **STOP** and output structured clarification questions. Do not pick a classification and continue.
+  - Do **not** write ACs, page structures, UI states, data models, service contracts, or implementation tasks.
+  - If a passage cannot be classified, mark it as `待 Plan 确认` and record an open question. **NEVER guess or hallucinate business logic.**
    - The analysis stage and the split stage are merged into this one step, but the artifacts remain two: `analysis.md` (human-facing) and `pending_maps` (machine-facing). There is no `DECOMPOSED` state.
    - Then run `node scripts/check-import.js requirements/IMP-YYYYMMDD-NNN`. Exit code **MUST** be 0.
 3. **⏸ PAUSE FOR HUMAN CONFIRMATION — MANDATORY**: This step is an **internal pause inside this command, not a separate command**. Stop and present the split result to the user (REQ list with titles and dependency relations), and ask for approval **in Chinese**. **MUST NOT create any REQ directory before the human replies.** This is the first approval point of Path A, mirroring how `/rudder-plan` waits for "PRD 批准".
@@ -30,16 +30,17 @@ Import an external requirement document, normalize it, analyze it into "global r
    - Create `requirements/REQ-XXX-<kebab-name>/` for **each** REQ in the entry, with all **7** artifacts (`README.md`, `plan.md`, `tasks.md`, `implement.md`, `verify.md`, `review.md`, `commit.md`). `README.md` starts at `status: PLANNED` / `stale: false`, `plan.md` at `status: DRAFT`.
    - Set the IMP's `metadata.yaml.status` to `approved`.
    - Immediately **remove** that `pending_maps` entry — the REQ is now carried by `AUTO-INDEX`, and must never be registered in two places.
-5. **Report to User**: Output the Requirement Tree and the clarification questions.
+5. **Report to User**: Output the rough feature tree, known dependencies, and open questions. After approval, tell the user to run `/rudder-plan REQ-XXX` for each created REQ.
 
 ## Pipeline Rules
 - The 4 states are **strictly one-way**. An `approved` IMP **MUST NOT** fall back to `analyzed` or `imported`; re-importing means creating a **new** IMP directory.
 - The pipeline has **no failure state**. "Parse failed" or "split unclear" means **stop in place and report**, never a branch state.
+- Import is not a PRD design step. Detailed design starts only after REQ skeletons exist and `/rudder-plan REQ-XXX` is invoked.
 - Only `.docx` / `.md` / `.txt` are supported. **PDF and xlsx are NOT supported** — tell the human so explicitly and cite the Non-Goal declaration in `.rudder/import/sources.md`, rather than attempting a parse.
 - `imported.md` contains legitimate backslash escapes emitted by `mammoth` (e.g. `YYYY\-MM\-DD`, `2\.1`). They render correctly — ignore them while splitting, and **do NOT** try to normalize them away.
 
 ## 🗣️ Interaction & Output Constraints (STRICT)
 - **User Interaction**: ALL questions, reports, and the approval prompt to the user **MUST be in Chinese (中文)**.
-  - *Required Approval Prompt*: "文档已分析并拆分完毕，请确认拆分结果。确认无误后，请回复：**拆分批准，创建 REQ 目录**。"
+  - *Required Approval Prompt*: "文档已粗略读取并拆分为功能点，请确认拆分结果。确认无误后，请回复：**拆分批准，创建 REQ 目录**。"
 - **Business Content**: Extracted business logic, requirement trees, and clarification questions **MUST be in Chinese**.
 - **System/Paths**: File paths, YAML keys, and structural markers remain in English.

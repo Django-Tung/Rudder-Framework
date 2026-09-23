@@ -1,85 +1,39 @@
-# 语义分析: [来源文档名称]（IMP-YYYYMMDD-NNN）
+# 粗拆分分析：[来源文档名称]（IMP-YYYYMMDD-NNN）
 
-> 本产物的 9 个小节规格见 `.rudder/analysis/analysis.md`。
-> 小节标题保留英文便于脚本与人工定位，正文用简体中文。
-> ⚠️ **禁止**在分析阶段补全文档未写明的内容——推测写进 `Ambiguities` 并转成澄清问题，
-> 不得直接写进 `Functional Requirements` 或 `Business Rules`。
+> Import 只做粗略读取和功能点拆分，不写详细 PRD。
+> AC、页面结构、UI 三态、数据模型和技术契约由 `/rudder-plan REQ-XXX` 完成。
 
-## Business Goal
+## 文档概览
 
-[这份文档要解决的业务问题、期望收益]
+[用几句话概括文档主题、目标和范围]
 
-## Actors
+## 候选功能点
 
-| 角色 | 职责 |
-|---|---|
-| [角色名] | [职责] |
+> 每个条目标注原文位置。这里是候选拆分，不是最终 PRD。
 
-## Functional Requirements
+- [REQ-CANDIDATE-1] [功能点名称]（原文：[章节或段落]）
 
-> 文档中明确提出的功能诉求，逐条列出。每条尽量标注原文位置（小节标题/段落），
-> 保持与 `imported.md` 的可追溯性。此节是「独立功能点」的候选池。
+## 明确的共享规则与术语
 
-- [FR-1] [功能诉求]（原文：§x.x）
-- [FR-2] [功能诉求]（原文：§x.x）
+> 只记录文档明确写出的内容；是否进入 MASTER-PRD 由人工确认。
 
-## Business Rules
+- [规则或术语]
 
-> 跨功能的约束、校验规则、计算规则。此节是「全局规则」的候选池。
-> 最终确认跨需求共享的条目，归入 `requirements/MASTER-PRD.md` 的「全局业务规则」。
+## 明确的依赖
 
-- [BR-1] [规则]
-- [BR-2] [规则]
+> 只记录文档明确表达的依赖；无法确定时放入下一节。
 
-## Non-functional Requirements
+- [功能点] 依赖 [功能点或外部系统]（原文：[章节或段落]）
 
-- [NFR-1] [性能 / 兼容性 / 可访问性等]
+## 待 Plan 确认
 
-## Dependencies
+> 记录不确定项，不在 Import 阶段自行补全。
 
-| 功能 / 模块 | 依赖对象 | 说明 |
-|---|---|---|
-| [功能] | [功能 / 外部系统] | [说明] |
+- [需要在详细 Plan 中确认的问题]
 
-> 此节直接决定 `pending_maps` 中各 REQ 条目的 `dependencies` 字段。
-
-## Constraints
-
-- [技术 / 时间 / 合规 / 组织层面的限制]
-
-## Ambiguities
-
-> 文档中**说不清**的地方。每一条都应转化成下方「澄清问题清单」中的问题。
-
-- [模糊点 1]
-- [模糊点 2]
-
-## Risks
-
-- [已知风险 / 不确定项]
-
----
-
-## ❓ 澄清问题清单
-
-> ⚠️ **强制章节**：`scripts/check-import.js` 断言本章节存在且**条目数 ≥ 1**。
-> 缺失或为空时，导入**视为未完成**，不得推进到 `analyzed` 状态。
-> 条目为可回答的封闭式或开放式问题，用中文。至少 1 条是**下限而非目标**。
-
-- [ ] 问题 1：[例如：忘记密码是跳转新页面还是弹窗？]
-- [ ] 问题 2：[例如：这段描述属于全局规则还是某个独立功能点？]
-
----
-
-## 🌳 需求树（供人工确认拆分）
-
-> 供 `/rudder-import` 内部暂停时展示给人工确认。拆分结论同时写入
-> `requirements/MASTER-PRD.md` 的 `pending_maps` 字段。
+## 需求树（供人工确认拆分）
 
 ```text
-[Epic]
-├── REQ-XXX [功能点名称]        priority: [high|medium|low]   dependencies: []
-└── REQ-YYY [功能点名称]        priority: [high|medium|low]   dependencies: [REQ-XXX]
+[文档主题]
+└── REQ-CANDIDATE-1 [功能点名称]
 ```
-
-**Completeness**：`High` | `Medium` | `Low` —— 为 `Medium` / `Low` 的功能点在 `/rudder-plan` 阶段必须先澄清。

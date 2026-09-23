@@ -89,6 +89,15 @@ project/
 
 需求有两条进入生命周期的路径，**在 `plan.md` 被批准之后完全汇流**。
 
+### 先选入口
+
+| 你的情况 | 使用入口 | 入口结束后做什么 |
+|---|---|---|
+| 已有一份完整需求文档 | `/rudder-import` | 人工批准功能点拆分后，对每个 REQ 执行 `/rudder-plan` |
+| 只有一个新想法或单个功能 | `/rudder-plan` | 直接进入详细 PRD 设计 |
+
+路径 A 的 Import 只回答“这份文档大致包含哪些功能点”，不回答“页面怎么做、AC 怎么写、接口和数据模型是什么”。这些问题统一在 Plan 阶段解决。
+
 | | **路径 A：批量（文档驱动）** | **路径 B：增量（人驱动）** |
 | :--- | :--- | :--- |
 | **触发** | `/rudder-import 需求文档.docx` | `/rudder-plan 需求描述` |
@@ -102,20 +111,33 @@ project/
 IMP 是**终止式管道**——4 个顺序状态、无失败态、无回环：
 
 ```text
-imported ──[分析+拆分]──► analyzed ──[人工确认]──► approved ──[归档]──► archived
+imported ──[粗读+拆分]──► analyzed ──[人工确认]──► approved ──[归档]──► archived
 ```
 
 1. **`imported`**：运行 `node scripts/import-docx.js <文档>` 归一化；
    创建 `requirements/IMP-YYYYMMDD-NNN/`，原件原样复制进 `source/`。
-2. **`analyzed`**：AI 产出 `analysis.md`（9 个小节 + **强制非空的澄清问题清单**），
-   并把拆分结论写入 `MASTER-PRD.md` 的 `pending_maps`（`status: DRAFT`）。
-   - **全局规则**归入 `MASTER-PRD.md` 的「全局业务规则 / 术语表」；
-   - **独立功能点**拆成 `pending_maps` 中的 REQ 条目。
-   - 判定模糊时**必须暂停**并输出结构化澄清问题，**严禁擅自猜测补全**。
+2. **`analyzed`**：AI 只做粗略读取和功能点拆分，产出轻量 `analysis.md`，
+   并把候选拆分结论写入 `MASTER-PRD.md` 的 `pending_maps`（`status: DRAFT`）。
+   - **全局规则 / 术语**只记录文档明确写出的候选项；
+   - **候选独立功能点**拆成 `pending_maps` 中的 REQ 条目；
+   - 不在 Import 阶段编写 AC、页面结构、UI 三态、数据模型或技术契约；
+   - 模糊内容标记为待 Plan 确认，不擅自补全。
 3. **⏸ 人工确认**：`/rudder-import` **内部暂停**，展示拆分结果（REQ 清单、标题、依赖关系），
    请人工用中文确认。**批准前不会创建任何 REQ 目录。**
 4. **`approved`**：人工确认后，该条目置 `APPROVED`，为其中每个 REQ 创建目录与 7 个产物文件，
    然后**立即从 `pending_maps` 移除**该条目——REQ 此后由 `AUTO-INDEX` 承接，不在两处登记。
+   接着对每个 REQ 运行 `/rudder-plan REQ-XXX`，完成详细 PRD 和技术契约。
+
+路径 A 的实际操作顺序：
+
+```text
+/rudder-import 需求文档.docx
+   ↓ 人工确认“拆分批准，创建 REQ 目录”
+/rudder-plan REQ-001
+/rudder-plan REQ-002
+   ↓ 分别批准各 REQ 的 plan.md
+/rudder-implement REQ-001
+```
 
 > **只支持 `.docx` / `.md` / `.txt`。PDF 与 xlsx 明确不受支持**（Non-Goal，见 `.rudder/import/sources.md` §5）。
 > `requirements/_inbox/` 已降级为临时暂存，仅保留 `fixtures/`，**不再承载任何管道产物**。
@@ -124,6 +146,14 @@ imported ──[分析+拆分]──► analyzed ──[人工确认]──► a
 
 直接创建 `requirements/REQ-XXX-<kebab-name>/` 与 7 个产物文件，`deps` 由**人工确认**，
 不经过 `pending_maps`。
+
+路径 B 的实际操作顺序：
+
+```text
+/rudder-plan 用户登录功能，需要邮箱密码和记住我
+   ↓ 人工确认“PRD 批准，状态改为 APPROVED”
+/rudder-implement REQ-001
+```
 
 ---
 

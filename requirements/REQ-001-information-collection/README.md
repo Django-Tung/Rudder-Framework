@@ -1,7 +1,7 @@
 ---
 id: REQ-001
 title: 信息采集与采集动态
-status: PLANNED
+status: VERIFIED
 source: IMP-20260924-001
 deps: []
 stale: false

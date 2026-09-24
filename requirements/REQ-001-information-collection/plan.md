@@ -1,5 +1,5 @@
 ---
-status: DRAFT
+status: APPROVED
 ---
 
 # 信息采集与采集动态

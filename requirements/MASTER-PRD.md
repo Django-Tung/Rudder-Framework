@@ -60,7 +60,7 @@ pending_maps: []
 <!-- BEGIN:AUTO-INDEX -->
 | 需求ID | 名称 | 状态 | Phase | 依赖 | 来源 | 路径 |
 |------|------|------|------|------|------|------|
-| REQ-001 | 信息采集与采集动态 | PLANNED | Plan | — | IMP-20260924-001 | REQ-001-information-collection/ |
+| REQ-001 | 信息采集与采集动态 | VERIFIED | Review | — | IMP-20260924-001 | REQ-001-information-collection/ |
 | REQ-002 | 多模态解析与信息归集 | PLANNED | Plan | REQ-001 | IMP-20260924-001 | REQ-002-multimodal-aggregation/ |
 | REQ-003 | 智能研判与风险规则 | PLANNED | Plan | REQ-002 | IMP-20260924-001 | REQ-003-intelligent-judgment/ |
 | REQ-004 | 投后项目管理 | PLANNED | Plan | REQ-001, REQ-003 | IMP-20260924-001 | REQ-004-portfolio-management/ |

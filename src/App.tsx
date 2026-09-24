@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 
+import CollectionPage from '@/pages/CollectionPage';
 import LoginPage from '@/pages/LoginPage';
 import SettingsPage from '@/pages/SettingsPage';
 import WorkspacePage from '@/pages/WorkspacePage';
 import { useAuthStore } from '@/stores/authStore';
 
-type AppView = 'workspace' | 'settings';
+type AppView = 'workspace' | 'settings' | 'collection';
 
 export default function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -33,5 +34,9 @@ export default function App() {
     return <SettingsPage onBack={() => setView('workspace')} />;
   }
 
-  return <WorkspacePage onOpenSettings={() => setView('settings')} />;
+  if (view === 'collection') {
+    return <CollectionPage onBack={() => setView('workspace')} />;
+  }
+
+  return <WorkspacePage onOpenSettings={() => setView('settings')} onOpenCollection={() => setView('collection')} />;
 }

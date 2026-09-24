@@ -5,6 +5,7 @@ import type { Permission } from '@/types/auth';
 
 interface WorkspacePageProps {
   onOpenSettings: () => void;
+  onOpenCollection: () => void;
 }
 
 const MODULES: Array<{ permission: Permission; label: string; description: string; icon: typeof Radar }> = [
@@ -13,7 +14,7 @@ const MODULES: Array<{ permission: Permission; label: string; description: strin
   { permission: 'reports', label: '报告中心', description: '研判成果与周期报告', icon: FileText },
 ];
 
-export default function WorkspacePage({ onOpenSettings }: WorkspacePageProps) {
+export default function WorkspacePage({ onOpenSettings, onOpenCollection }: WorkspacePageProps) {
   const user = useAuthStore((state) => state.user);
   const signOut = useAuthStore((state) => state.signOut);
 
@@ -86,7 +87,7 @@ export default function WorkspacePage({ onOpenSettings }: WorkspacePageProps) {
           <div className="mb-4 flex items-center justify-between"><h2 className="text-sm font-semibold text-slate-800">业务模块</h2><span className="text-xs text-slate-400">已授权 {visibleModules.length} 项</span></div>
           <div className="grid gap-4 md:grid-cols-3">
             {visibleModules.map(({ icon: Icon, label, description }) => (
-              <button className="group rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-950/5" key={label}>
+              <button className="group rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-950/5" key={label} onClick={label === '信息采集' ? onOpenCollection : undefined}>
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700"><Icon size={20} /></span>
                 <h3 className="mt-5 text-base font-semibold text-slate-900">{label}</h3>
                 <p className="mt-1 text-sm text-slate-500">{description}</p>

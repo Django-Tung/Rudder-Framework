@@ -68,5 +68,5 @@ pending_maps: []
 | REQ-006 | 报告中心 | PLANNED | Plan | REQ-003, REQ-004, REQ-005 | IMP-20260924-001 | REQ-006-report-center/ |
 | REQ-007 | 智能对话与反馈 | PLANNED | Plan | REQ-002, REQ-003, REQ-004, REQ-005 | IMP-20260924-001 | REQ-007-intelligent-dialogue/ |
 | REQ-008 | 外部系统对接与指标分享 | PLANNED | Plan | REQ-004, REQ-005, REQ-009 | IMP-20260924-001 | REQ-008-external-integrations/ |
-| REQ-009 | 权限与系统设置 | PLANNED | Plan | — | IMP-20260924-001 | REQ-009-access-settings/ |
+| REQ-009 | 权限与系统设置 | VERIFYING | Verify | — | IMP-20260924-001 | REQ-009-access-settings/ |
 <!-- END:AUTO-INDEX -->

@@ -1,7 +1,7 @@
 ---
 id: REQ-009
 title: 权限与系统设置
-status: PLANNED
+status: VERIFYING
 source: IMP-20260924-001
 deps: []
 stale: false

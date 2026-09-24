@@ -1,7 +1,14 @@
 ---
-status: DRAFT
+status: READY
 ---
 
 # 任务清单
 
-待 `/rudder-implement REQ-009` 在 PRD 批准后拆解。
+- [ ] AC-1：实现登录页面与输入校验
+- [ ] AC-2：实现模拟登录和登录后跳转
+- [ ] AC-3：实现登录失败反馈
+- [ ] AC-4：实现退出登录和受保护访问
+- [ ] AC-5：实现模拟权限范围控制
+- [ ] AC-6：实现认证 Loading / Error / Empty 三态
+
+任务尚未实施，待 `/rudder-implement REQ-009` 按技术契约拆解和执行。

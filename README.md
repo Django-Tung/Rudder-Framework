@@ -4,7 +4,7 @@
 
 Rudder Framework 是一个为 AI Agent（如 Claude Code, Hermes Agent）设计的结构化需求原型开发框架。它通过**严格的规则约束**、**标准化的文档模板**和**自动化的反馈闭环**，确保 AI 能够高质量、可追溯地交付纯前端 React 原型。
 
-第一次使用请先阅读[新手教程](docs/getting-started.md)，其中包含环境准备、依赖安装、开发服务器启动和第一个需求的完整示例。
+第一次使用请先阅读[新手教程](docs/getting-started.md)，其中包含环境准备、依赖安装、开发服务器启动和第一个需求的完整示例。快捷跳转：[环境准备](docs/getting-started.md#1-准备环境) · [创建需求](docs/getting-started.md#5-创建第一个需求) · [实施与提交](docs/getting-started.md#6-实施和提交需求) · [修复 Bug 与变更需求](docs/getting-started.md#7-修复-bug-或变更需求) · [命令速查](docs/getting-started.md#9-命令速查)
 
 ### 核心设计理念
 
@@ -135,9 +135,9 @@ imported ──[粗读+拆分]──► analyzed ──[人工确认]──► a
    ↓ 人工确认“拆分批准，创建 REQ 目录”
 /rudder-plan REQ-001
 /rudder-plan REQ-002
-   ↓ 分别批准各 REQ 的 plan.md
+   ↓ 对每个 REQ 执行 /rudder-plan-confirm REQ-XXX 并明确批准
 /rudder-implement REQ-001
-```
+此时才补充用户故事、AC、页面结构、UI 三态、数据模型和技术契约。Plan 完成后先 Review，再对每个 REQ 执行 `/rudder-plan-confirm REQ-XXX` 并明确批准；命令调用本身不代表批准。
 
 > **只支持 `.docx` / `.md` / `.txt`。PDF 与 xlsx 明确不受支持**（Non-Goal，见 `.rudder/import/sources.md` §5）。
 > `requirements/_inbox/` 已降级为临时暂存，仅保留 `fixtures/`，**不再承载任何管道产物**。
@@ -153,7 +153,8 @@ imported ──[粗读+拆分]──► analyzed ──[人工确认]──► a
 
 ```text
 /rudder-plan 用户登录功能，需要邮箱密码和记住我
-   ↓ 人工确认“PRD 批准，状态改为 APPROVED”
+   ↓ Review plan.md 后执行 /rudder-plan-confirm REQ-001
+   ↓ 明确回复“PRD 批准，状态改为 APPROVED”
 /rudder-implement REQ-001
 ```
 
@@ -197,7 +198,7 @@ PLANNED ──► IMPLEMENTING ──► IMPLEMENTED ──► COMMITTED
    - ⚠️ 验收标准必须以 `AC-1` / `AC-2` 形式编号，且 `tasks.md` 拆解时逐条引用——
      `npm run check:req` 的 **I1（拆解完备）** 依赖此格式，编号不规范会让该校验形同虚设。
    - **非目标**是防范围蔓延的硬边界，Implement 完成检查会逐条核对。
-6. **门控 (Gate)**：用户 Review `plan.md`。确认无误后，回复："**PRD 批准，状态改为 APPROVED**"。
+6. **门控 (Gate)**：Agent 将 `plan.md` 保持为 `DRAFT` 并展示核心内容。用户 Review 后，执行 `/rudder-plan-confirm REQ-XXX`（Hermes 用户调用相应技能），再明确回复："**PRD 批准，状态改为 APPROVED**"。命令调用本身不代表批准；有未确认事项时先澄清，不得推进 Implement。
 
 ### 阶段 2：Implement (代码实施)
 
@@ -285,6 +286,7 @@ REQ-001 契约变更
 | :--- | :--- |
 | **路径 A：Import** | `/rudder-import 需求文档.docx` |
 | **路径 B：Plan** | `/rudder-plan 用户登录功能，需要邮箱密码和记住我` |
+| **Plan 确认** | `/rudder-plan-confirm REQ-001`，Review 后明确回复“PRD 批准，状态改为 APPROVED” |
 | **Implement** | `/rudder-implement REQ-001` |
 | **实施后调整** | `/rudder-adjust REQ-001 修改内容` |
 | **Commit** | `/rudder-commit REQ-001` |
@@ -298,6 +300,7 @@ REQ-001 契约变更
 | :--- | :--- |
 | **路径 A：Import** | "调用 rudder-import 技能，导入需求文档.docx。" |
 | **路径 B：Plan** | "调用 rudder-plan 技能。我想做一个用户登录功能，需要邮箱密码和记住我。" |
+| **Plan 确认** | "Review 完成。调用 rudder-plan-confirm 技能确认 REQ-001；PRD 批准，状态改为 APPROVED。" |
 | **Implement** | "PRD 已批准。调用 rudder-implement 技能，开始实施 REQ-001。" |
 | **实施后调整** | "调用 rudder-adjust 技能，处理 REQ-001 的实施后修改。" |
 | **Commit** | "Review 已通过。调用 rudder-commit 技能，提交并归档 REQ-001。" |

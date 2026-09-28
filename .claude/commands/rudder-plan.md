@@ -37,11 +37,12 @@ Transform a vague idea or a rough feature skeleton into the detailed, contract-f
      - **Tech Contract & Data Model** (Zustand Store, Mock Schema)
 6. **Gate**:
    - Set `plan.md` `status` to `DRAFT`, and sync `README.md` `status` to `PLANNED` (derived value, see `.rudder/workflow/states.md`).
-   - Present the core PRD (especially Page Structure) to the user.
-  - If the user's approval is unclear, ask them to run `/rudder-plan-confirm REQ-XXX`.
+  - Present the core PRD (especially Page Structure) and the created `REQ-ID` to the user.
+  - Always give the next-step handoff: ask the user to review `plan.md`, then run `/rudder-plan-confirm REQ-XXX` and explicitly approve it. For Hermes, tell the user to invoke `rudder-plan-confirm` for the same `REQ-ID`.
+  - State that invoking the confirmation command alone is not approval. Keep `plan.md` as `DRAFT` until `rudder-plan-confirm` receives explicit human approval.
 
 ## 🗣️ Interaction & Output Constraints (STRICT)
 - **User Interaction**: ALL clarification questions and the final approval prompt **MUST be in Chinese**.
-  - *Required Approval Prompt*: "请 Review。确认无误后，请回复：**PRD 批准，状态改为 APPROVED**"
+  - *Required Approval Prompt*: "请先 Review `plan.md`。确认无误后，下一步请执行 `/rudder-plan-confirm REQ-XXX` 并明确回复：**PRD 批准，状态改为 APPROVED**。"
 - **Business Content**: The entire content of `plan.md` (Background, Stories, ACs, Page Structure) **MUST be written in Chinese**. Technical terms, component names, and YAML keys can remain in English.
 - **UI Style Confirmation**: The primary UI style must be confirmed by the human and recorded in `MASTER-PRD.md`; it must not be inferred or silently selected by the Agent.

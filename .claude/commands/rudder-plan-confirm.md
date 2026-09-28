@@ -11,16 +11,17 @@ argument-hint: [REQ-ID]
 
 ## 目标
 
-处理 `/rudder-plan` 的确认不清楚场景。只有用户明确确认且所有重大澄清问题已解决时，才允许将 `plan.md` 置为 `APPROVED`。
+承接 `/rudder-plan` 生成的 `DRAFT` 计划，完成最后的人工 Review 与明确批准。调用本命令本身不代表批准；只有所有重大澄清问题已解决且用户明确批准，才允许将 `plan.md` 置为 `APPROVED`。
 
 ## 执行步骤
 
 1. 读取目标 REQ 的 `README.md`、`plan.md`、`MASTER-PRD.md` 及依赖方的 `plan.md`。
-2. 汇总 `plan.md` 中的待澄清问题、验收标准、页面结构和技术契约。
-3. 检查所有重大澄清问题、UI 主风格、范围、依赖和边界是否已由用户确认。
-4. 如果仍有未确认项，列出原因并保持 `plan.md = DRAFT`、`README.md = PLANNED`，停止。
-5. 如果用户明确批准且无阻断项，将 `plan.md` 设置为 `APPROVED`，同步 `README.md = PLANNED`，运行 `npm run check:req`。
-6. 通过后提示用户执行 `/rudder-implement REQ-XXX`。
+2. 向用户简要汇总 `plan.md` 的范围、验收标准、页面结构和技术契约，便于 Review。
+3. 检查所有重大澄清问题、UI 主风格、范围、依赖和边界是否都已由用户确认。
+4. 如果仍有未确认项，逐项列出并向用户提问；保持 `plan.md = DRAFT`、`README.md = PLANNED`，不得批准。若回答会改变计划内容，先回到 `/rudder-plan` 更新计划，再重新确认。
+5. 如果所有事项已明确，但用户尚未明确批准，提示用户回复：**PRD 批准，状态改为 APPROVED**。保持 `plan.md = DRAFT` 并等待用户确认；不得把命令调用或沉默视为批准。
+6. 只有收到用户明确批准后，才将 `plan.md` 设置为 `APPROVED`，同步 `README.md = PLANNED`，运行 `npm run check:req`。检查失败时报告错误并停止，不得提示开始实施。
+7. 检查通过后提示用户执行 `/rudder-implement REQ-XXX`。
 
 ## 约束
 

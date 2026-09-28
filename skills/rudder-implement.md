@@ -13,7 +13,7 @@ hermes:
     - 实施需求
 ---
 
-> This covers **Phase 2 (Tasks)** and **Phase 3 (Implement)** of the requirement lifecycle, strictly following `.rudder/workflow/lifecycle.md`.
+> This covers **Tasks** and **Implement** of the requirement lifecycle, strictly following `.rudder/workflow/lifecycle.md`.
 
 ## Goal
 Execute the implementation of an approved PRD by breaking it down into tasks, planning the component structure based on the Page Structure, and writing contract-first code.
@@ -32,8 +32,9 @@ Extract the target REQ-ID from user input. If missing, **MUST ask in Chinese**.
 4. **Contract-First Coding**: Code in strict order: `Types` -> `Mocks` (**every mock/service MUST simulate 300–800ms latency via `setTimeout`**) -> `Services` -> `UI` (React + Tailwind).
    - UI **MUST** implement Loading / Empty / Error states.
    - Check off `tasks.md` in real-time, and keep `README.md` `status` in sync (derived value, see `.rudder/workflow/states.md`).
-5. **Finalize**: Set `tasks.md` status to `DONE`. Update `implement.md` with change summary and file list, set status to `COMPLETED`, and sync `README.md` status to `VERIFYING`.
-6. **Invariant Check**: Run `npm run check:req`. Exit code **MUST** be 0. If fails, fix and retry.
+5. **Quality Checks**: After implementation, run `npm run typecheck`, `npm run lint`, `npm run build`, `npm run check:skills`, and `npm run check:req` in order. Any failure must be fixed and retried, with at most 3 rounds.
+6. **Finalize**: Set `tasks.md` status to `DONE`. Record the implementation summary, file list, and complete machine-check output in `implement.md`; set status to `COMPLETED`, and sync `README.md` status to `IMPLEMENTED`.
+7. **Failure Rule**: After 3 failed rounds, keep `implement.md` as `IN_PROGRESS`, record the failures, stop, and report to the human.
 
 ## 🗣️ Interaction & Output Constraints (STRICT)
 - **UI Copy**: All user-facing text in the UI components **MUST be in Chinese**.

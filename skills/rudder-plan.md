@@ -34,7 +34,7 @@ If ambiguous, **MUST ask the user in Chinese** to clarify.
   - Ask every material clarification question about business rules, scope, actors, edge cases, dependencies, and UI behavior in Chinese. **Do not guess or fill gaps. Do not create or complete the formal PRD until the human answers.** Record confirmed cross-REQ rules and terminology in `MASTER-PRD.md`.
 2. **Context Loading**:
   - If user provides `REQ-XXX`: Read the existing skeleton at `requirements/REQ-XXX-xxx/plan.md`, the matching rough analysis, and the matching `pending_maps` entry in `requirements/MASTER-PRD.md`. **FORBIDDEN to re-read the lengthy raw imported document** (`requirements/IMP-*/imported.md`).
-   - If user provides a new description (Path B, manual registration): create a new `REQ-XXX-<kebab-name>/` directory holding all **7** artifacts. `README.md` must carry `id` / `title` / `status: PLANNED` / `deps` / `stale: false`, with `deps` **confirmed by the human, never guessed**.
+  - If user provides a new description (Path B, manual registration): create a new `REQ-XXX-<kebab-name>/` directory holding all **5** artifacts. `README.md` must carry `id` / `title` / `status: PLANNED` / `deps` / `stale: false`, with `deps` **confirmed by the human, never guessed**.
 3. **Dependency Gate**: For every REQ listed in `deps`, confirm its `plan.md` status is `APPROVED`. If any dependency is still `DRAFT`, **STOP** and report the blocking dependency together with its current status. Do **NOT** advance. (Path A additionally requires the split to be already `APPROVED`.)
 4. **Clarify First**:
   - Treat Import output as candidate scope only. Ask clarification questions for missing business logic, edge cases, or acceptance boundaries before writing the detailed PRD.
@@ -51,6 +51,7 @@ If ambiguous, **MUST ask the user in Chinese** to clarify.
 6. **Gate**:
    - Set `plan.md` `status` to `DRAFT`, and sync `README.md` `status` to `PLANNED` (derived value, see `.rudder/workflow/states.md`).
    - Present the core PRD (especially Page Structure) to the user.
+  - If the user's approval is unclear, ask them to run `/rudder-plan-confirm REQ-XXX`.
 
 ## 🗣️ Interaction & Output Constraints (STRICT)
 - **User Interaction**: ALL clarification questions and the final approval prompt **MUST be in Chinese**.

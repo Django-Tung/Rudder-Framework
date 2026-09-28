@@ -13,7 +13,7 @@ hermes:
     - 提交代码
 ---
 
-> This is **Phase 6 (Commit)** of the requirement lifecycle, strictly following `.rudder/workflow/lifecycle.md`. Archive is the post-action of Commit, not a phase of its own.
+> This is the **Commit** phase of the requirement lifecycle, strictly following `.rudder/workflow/lifecycle.md`. Archive is the post-action of Commit, not a phase of its own.
 
 ## Goal
 Perform strict pre-commit checks, clean up the code, commit to Git, and archive the requirement directory.
@@ -24,12 +24,10 @@ Extract the target REQ-ID. If missing, **MUST ask in Chinese**.
 <!-- hermes-only:end -->
 
 ## Execution Steps
-1. **5-Point Gate Check**: **MUST** satisfy ALL simultaneously. Stop and error immediately if any fails, reporting each precondition's current value against its expected value:
+1. **3-Point Gate Check**: **MUST** satisfy ALL simultaneously. Stop and error immediately if any fails, reporting each precondition's current value against its expected value:
    - `plan.md` == `APPROVED`
    - `tasks.md` == `DONE`
    - `implement.md` == `COMPLETED`
-   - `verify.md` == `PASS`
-   - `review.md` == `APPROVED`
 2. **Garbage Collection**: Clean up unused imports, non-debug `console.log`s, and dead code.
 3. **Git Commit**: Execute `git add` and `git commit` (Chinese commit message). Update `commit.md` status to `DONE` and sync `README.md` status to `COMMITTED`.
 4. **Archive**:

@@ -51,7 +51,7 @@
 | `IN_PROGRESS` → `COMPLETED` | `tasks.md` 全部勾选且 `tasks.md` = `DONE` |
 | `COMPLETED` → `OUTDATED` | 仅由需求变更触发（[`../workflow/transitions.md`](../workflow/transitions.md) §4） |
 
-**置为 `COMPLETED` 的同时必须**：更新 `README.md` 顶层 `status` 为 `VERIFYING`，并运行
+**置为 `COMPLETED` 的同时必须**：更新 `README.md` 顶层 `status` 为 `IMPLEMENTED`，并运行
 `npm run check:req`（退出码必须为 0）。
 
 ## 5. 内容约束

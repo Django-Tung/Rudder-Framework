@@ -43,7 +43,7 @@ If the path is missing, **MUST ask the user in Chinese** to provide it. **NEVER 
 5. **⏸ PAUSE FOR HUMAN CONFIRMATION — MANDATORY**: This step is an **internal pause inside this command, not a separate command**. Stop and present the split result to the user (REQ list with titles and dependency relations), and ask for approval **in Chinese**. **MUST NOT create any REQ directory before the human replies.** This is the first approval point of Path A, mirroring how `/rudder-plan` waits for "PRD 批准".
 6. **Approve & Materialize** (`approved`): Only after the human confirms the split:
    - Set that `pending_maps` entry's `status` to `APPROVED`.
-   - Create `requirements/REQ-XXX-<kebab-name>/` for **each** REQ in the entry, with all **7** artifacts (`README.md`, `plan.md`, `tasks.md`, `implement.md`, `verify.md`, `review.md`, `commit.md`). `README.md` starts at `status: PLANNED` / `stale: false`, `plan.md` at `status: DRAFT`.
+  - Create `requirements/REQ-XXX-<kebab-name>/` for **each** REQ in the entry, with all **5** artifacts (`README.md`, `plan.md`, `tasks.md`, `implement.md`, `commit.md`). `README.md` starts at `status: PLANNED` / `stale: false`, `plan.md` at `status: DRAFT`.
    - Set the IMP's `metadata.yaml.status` to `approved`.
    - Immediately **remove** that `pending_maps` entry — the REQ is now carried by `AUTO-INDEX`, and must never be registered in two places.
 7. **Report to User**: Output the confirmed UI primary style, rough feature tree, known dependencies, and remaining open questions. After approval, tell the user to run `/rudder-plan REQ-XXX` for each created REQ.

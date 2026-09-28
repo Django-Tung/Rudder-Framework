@@ -21,8 +21,8 @@
 | `/rudder-import [文档路径]` | 路径 A：导入 .docx/.md/.txt → 分析拆分 → **暂停等人工批准** → 批量产出 REQ 目录 |
 | `/rudder-plan [需求描述]` | 路径 B：澄清需求 → 生成 `requirements/REQ-XXX-*/plan.md`（PRD + 技术契约） |
 | `/rudder-implement [REQ-ID]` | 拆解 `tasks.md` 后按契约实施 Types → Mocks → Services → UI |
-| `/rudder-verify [REQ-ID]` | 跑 typecheck / lint / build / check:skills / check:req，自动修复，记录机器证据 |
-| `/rudder-review [REQ-ID]` | 对照 `plan.md` 的 AC 逐条核对，交人工审批 |
+| `/rudder-plan-confirm [REQ-ID]` | 处理 PRD 确认不清楚的情况并推进批准 |
+| `/rudder-adjust [REQ-ID] [修改内容]` | 实施完成后的修改；契约变更转交 `rudder-change` |
 | `/rudder-commit [REQ-ID]` | 校验五项前置状态 → 原子 git 提交 + 归档 |
 | `/rudder-change [REQ-ID] [变更]` | 需求变更：更新 PRD + 级联失效 + 代码冻结，并向下游传导 `STALE` |
 
@@ -30,7 +30,7 @@
 
 ## 硬性约束
 
-违反以下任一条，会在 `verify` 或 `review` 阶段被打回。
+违反以下任一条，会在 Implement 的质量检查中被阻断。
 
 **语言**
 - 所有沟通、需求文档、UI 文案、commit message 用**简体中文**；代码与变量名用英文。
@@ -58,7 +58,7 @@
 - 严格遵循 `.rudder/workflow/` 下的四份规则文件，不得越级推进。
 - `plan.md` 的 `APPROVED` **只能由人工写入**，Agent 不得自行批准。
 - 进入 Plan 阶段前，`README.md` 中 `deps` 列出的每个 REQ 的 `plan.md` **必须已是 `APPROVED`**。
-- 每个需求的产物落在 `requirements/REQ-XXX-*/` 下，**7 个文件**——6 个阶段产物 + 承载顶层状态的 `README.md`，
+- 每个需求的产物落在 `requirements/REQ-XXX-*/` 下，**5 个文件**——4 个阶段产物 + 承载顶层状态的 `README.md`，
   各自记录自己 frontmatter 里的 `status`。
 - 每次阶段动作后，**必须同步更新 `README.md` 的顶层 `status`**（派生值），再由 `npm run check:req` 断言一致。
 

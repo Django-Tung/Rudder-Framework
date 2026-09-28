@@ -3,25 +3,23 @@
 > 本文件回答「**一个 REQ 目录里有哪些文件、`README.md` 的 frontmatter 各字段是什么类型**」。
 > `status` 的**取值与推导**在 [`../workflow/states.md`](../workflow/states.md) 定义，本文件**只引用不复述**。
 
-## 1. 目录结构：7 个文件
+## 1. 目录结构：5 个文件
 
-每个需求**必须**拥有独立目录 `requirements/REQ-XXX-<kebab-name>/`，内含 **7 个**产物文件：
+每个需求**必须**拥有独立目录 `requirements/REQ-XXX-<kebab-name>/`，内含 **5 个**产物文件：
 
 ```text
 requirements/REQ-XXX-<kebab-name>/
 ├── README.md        ← REQ 级元数据：顶层状态与依赖（本文件 §2）
 ├── plan.md          ← 阶段 1. Plan
 ├── tasks.md         ← 阶段 2. Tasks
-├── implement.md     ← 阶段 3. Implement
-├── verify.md        ← 阶段 4. Verify
-├── review.md        ← 阶段 5. Review
-└── commit.md        ← 阶段 6. Commit
+├── implement.md    ← 阶段 3. Implement（含机器检查证据）
+└── commit.md       ← 阶段 4. Commit
 ```
 
 - `<kebab-name>` 用小写英文与连字符（如 `user-login`）。
-- 6 个阶段产物的规格见 [`../workflow/lifecycle.md`](../workflow/lifecycle.md) §1；
+- 4 个阶段产物的规格见 [`../workflow/lifecycle.md`](../workflow/lifecycle.md) §1；
   各自的 `status` 取值见 [`../workflow/states.md`](../workflow/states.md) §1。
-- 旧版本的 6 文件结构（无 `README.md`）**已废弃**。
+- 旧版本的 7 文件结构不再用于新 REQ。
 
 ## 2. `README.md` frontmatter 字段 schema
 
@@ -51,7 +49,7 @@ stale_since: ""
 
 ### 2.1 `status` 是派生值
 
-`status` **由 6 个阶段产物的 `status` 推导得出**，`README.md` 中存储的只是它的**持久化副本**。
+`status` **由 3 个阶段产物的 `status` 推导得出**，`README.md` 中存储的只是它的**持久化副本**。
 
 - 推导表：见 [`../workflow/states.md`](../workflow/states.md) §2（**唯一定义处**）。
 - 一致性由 `npm run check:req` 断言，不符时报出期望值与实际值。
@@ -59,7 +57,7 @@ stale_since: ""
 ### 2.2 `stale` 的语义
 
 `stale` 是**跨 REQ** 的正交标记，**不进入** `status` 枚举。它与
-`OUTDATED` / `INVALIDATED`（同一 REQ 内的失效态）是**两套机制**，
+`OUTDATED`（同一 REQ 内的失效态）是**两套机制**，
 区别见 [`../analysis/dependency.md`](../analysis/dependency.md) §3。
 
 ### 2.3 初值
@@ -89,5 +87,5 @@ stale_since: ""
 ## 5. 归档后的结构
 
 归档时整个目录被 `git mv` 到 `requirements/archive/<YYYY-MM>-REQ-XXX-<kebab-name>/`，
-**内部结构不变**，仍是 7 个文件。归档即封存，**不得就地修改**
+**内部结构不变**，仍是 5 个文件。归档即封存，**不得就地修改**
 （见 [`../workflow/transitions.md`](../workflow/transitions.md) §6）。

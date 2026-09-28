@@ -17,10 +17,8 @@ PENDING
 
 ## 前置条件检查 (Preconditions)
 - [ ] `plan.md` 状态: APPROVED ✅
+- [ ] `tasks.md` 状态: DONE ✅
 - [ ] `implement.md` 状态: COMPLETED ✅
-- [ ] `verify.md` 状态: PASS ✅
-- [ ] `review.md` 状态: APPROVED ✅
-- [ ] 人工审批: 已通过 ✅
 
 > ⚠️ 如果任何前置条件未满足，Agent 必须停止并报告缺失项。
 

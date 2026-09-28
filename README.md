@@ -9,11 +9,11 @@ Rudder Framework 是一个为 AI Agent（如 Claude Code, Hermes Agent）设计�
 ### 核心设计理念
 
 - **规则与事实分离**：`.rudder/` 存放不可变的工程规则与模板；`requirements/` 存放具体需求的执行记录与证据。
-- **证据优于承诺**：AI 不能口头声称"代码没问题"，必须在 `verify.md` 中留下机器验证（Build/Lint）通过的日志证据。
+- **证据优于承诺**：AI 不能口头声称"代码没问题"，必须在 `implement.md` 中留下机器验证通过的日志证据。
 - **双层状态**：每个需求有 **REQ 顶层状态**（`README.md` 的 `status`，回答"整体走到哪了"）
-  与 **阶段产物状态**（6 个文件各自的 `status`，回答"这个文件自身什么状态"）。
+   与 **阶段产物状态**（4 个文件各自的 `status`，回答"这个文件自身什么状态"）。
   顶层状态**由产物状态推导**，一致性由脚本断言。
-- **状态机驱动**：每个需求严格按 `Plan -> Tasks -> Implement -> Verify -> Review -> Commit` 流转（归档为 Commit 的后置动作），不可越级。
+- **状态机驱动**：每个需求严格按 `Plan -> Tasks -> Implement -> Commit` 流转（归档为 Commit 的后置动作），不可越级。
 - **依赖受控**：需求之间可以声明依赖，进入 Plan 前必须确认依赖方「已定下来要做什么」（`plan.md` = `APPROVED`）。
   上游契约变更时，机器算依赖闭包并标 `STALE`，**由人逐跳裁决**是否真受影响。
 - **变更受控**：需求范围中途变更**禁止就地默默改代码**，必须走 `/rudder-change` 协议，将 `plan.md` 退回 `DRAFT`、级联失效下游证据，并向下游传导 `STALE`。
@@ -49,13 +49,11 @@ project/
 │
 ├── requirements/             # 【事实与证据】具体需求的工作区
 │   ├── MASTER-PRD.md         # 全局业务规则、术语表、需求索引 + 待批准拆分（pending_maps）
-│   ├── REQ-001-xxx/          # 单个需求的完整生命周期档案（7 个文件）
+│   ├── REQ-001-xxx/          # 单个需求的完整生命周期档案（5 个文件）
 │   │   ├── README.md         #   REQ 级元数据：顶层状态、依赖、STALE
 │   │   ├── plan.md
 │   │   ├── tasks.md
 │   │   ├── implement.md
-│   │   ├── verify.md
-│   │   ├── review.md
 │   │   └── commit.md
 │   ├── IMP-YYYYMMDD-NNN/     # 一次文档导入的管道目录
 │   │   ├── source/           #   原件留痕
@@ -163,7 +161,7 @@ imported ──[粗读+拆分]──► analyzed ──[人工确认]──► a
 
 ## 4. 标准工作流
 
-一个需求从提出到归档，需经历 **6 个标准阶段**：`Plan -> Tasks -> Implement -> Verify -> Review -> Commit`，
+一个需求从提出到归档，需经历 **4 个标准阶段**：`Plan -> Tasks -> Implement -> Commit`，
 外加 Commit 之后的**归档**后置动作。
 
 > 为便于阅读，下文把 **Tasks（任务拆解）** 并入「阶段 2：Implement」一并叙述——它实际是 Implement 的起始步骤，且有独立的状态与不变量校验。
@@ -171,19 +169,16 @@ imported ──[粗读+拆分]──► analyzed ──[人工确认]──► a
 ### REQ 顶层状态机
 
 ```text
-PLANNED ──► IMPLEMENTING ──► VERIFYING ──► VERIFIED ──► REVIEWING ──► REVIEWED ──► COMMITTED
+PLANNED ──► IMPLEMENTING ──► IMPLEMENTED ──► COMMITTED
 ```
 
-顶层 `status` **由 6 个产物的 `status` 推导得出**，`README.md` 中存的是持久化副本：
+顶层 `status` **由 3 个产物的 `status` 推导得出**，`README.md` 中存的是持久化副本：
 
 | 顶层 `status` | 推导条件 |
 |---|---|
 | `PLANNED` | `plan.md` ∈ {`DRAFT`,`APPROVED`} ∧ `implement.md` = `PENDING` |
-| `IMPLEMENTING` | `implement.md` ∈ {`IN_PROGRESS`,`OUTDATED`} 或 `review.md` = `CHANGES_REQUESTED` |
-| `VERIFYING` | `implement.md` = `COMPLETED` ∧ `verify.md` ∈ {`PENDING`,`FAIL`} |
-| `VERIFIED` | `verify.md` = `PASS` ∧ `review.md` = `PENDING` |
-| `REVIEWING` | `verify.md` = `PASS` ∧ `review.md` = `PENDING_HUMAN_REVIEW` |
-| `REVIEWED` | `review.md` = `APPROVED` ∧ `commit.md` = `PENDING` |
+| `IMPLEMENTING` | `implement.md` ∈ {`IN_PROGRESS`,`OUTDATED`} |
+| `IMPLEMENTED` | `implement.md` = `COMPLETED` ∧ `commit.md` = `PENDING` |
 | `COMMITTED` | `commit.md` = `DONE` |
 
 > `stale`（跨 REQ 的上游变更标记）是**正交**的布尔字段，**不进入**该枚举。
@@ -201,7 +196,7 @@ PLANNED ──► IMPLEMENTING ──► VERIFYING ──► VERIFIED ──► 
 5. **AI 响应**：按 `.rudder/templates/plan.md` 创建 `plan.md`，填入业务背景与**非目标 (Non-Goals)**、用户故事与场景、BDD 验收标准、UI/UX 三态规范、技术契约与数据模型，状态设为 `DRAFT`；同步 `README.md` 顶层状态为 `PLANNED`。
    - ⚠️ 验收标准必须以 `AC-1` / `AC-2` 形式编号，且 `tasks.md` 拆解时逐条引用——
      `npm run check:req` 的 **I1（拆解完备）** 依赖此格式，编号不规范会让该校验形同虚设。
-   - **非目标**是防范围蔓延的硬边界，Review 阶段的「范围合规」会逐条核对。
+   - **非目标**是防范围蔓延的硬边界，Implement 完成检查会逐条核对。
 6. **门控 (Gate)**：用户 Review `plan.md`。确认无误后，回复："**PRD 批准，状态改为 APPROVED**"。
 
 ### 阶段 2：Implement (代码实施)
@@ -213,44 +208,20 @@ PLANNED ──► IMPLEMENTING ──► VERIFYING ──► VERIFIED ──► 
    - 按 `plan.md` 验收标准拆解 `tasks.md`（每条标注 AC 编号，状态 `READY`）。
    - 严格按顺序开发：`Types` -> `Mocks` (含 300-800ms 延迟) -> `Services` -> `UI` (含 Loading/Error/Empty 状态，且文案全为中文)，并实时勾选 `tasks.md`。
    - 全部勾选后置 `tasks.md` 为 `DONE`，将变更摘要和文件列表写入 `implement.md`，状态设为 `COMPLETED`；
-     同步 `README.md` 顶层状态为 `VERIFYING`。
+   同步 `README.md` 顶层状态为 `IMPLEMENTED`。
 3. **不变量校验**：AI 须运行 `npm run check:req` 且退出码为 0。它拦截两类作弊：
    **I1 拆解不完备**（AC 未被任务覆盖）、**I2 虚假完成**（`implement.md` 已 `COMPLETED` 但 `tasks.md` 仍有未勾选项），
    并断言顶层状态推导一致。
-4. **门控 (Gate)**：AI 提示实施完成，等待验证指令。
+4. **质量检查**：顺序执行 `npm run typecheck`、`npm run lint`、`npm run build`、`npm run check:skills`、`npm run check:req`，并将完整输出记录到 `implement.md`。最多自动修复 3 轮。
+5. **门控 (Gate)**：全部检查通过后，`implement.md = COMPLETED`、顶层状态为 `IMPLEMENTED`。
 
-### 阶段 3：Verify (机器验证)
-
-**目标**：通过自动化命令生成不可伪造的通过证据。
-
-1. **用户操作**：下达验证指令（如："验证 REQ-001"）。
-2. **AI 响应 (自动闭环)**：
-   - 依次执行 `npm run typecheck`、`npm run lint`、`npm run build`、`npm run check:skills`、`npm run check:req`。
-     （`check:skills` 与 `check:req` 与前三条**同级**，非零退出即不通过。）
-   - **如果报错**：AI **必须**读取终端报错，自动修复代码，并重新运行，直到 0 报错。
-   - **如果通过**：AI 将成功的终端输出记录到 `verify.md`，状态设为 `PASS`；同步顶层状态为 `VERIFIED`。
-   - **连续失败 3 轮**：AI **必须停止**，将 `verify.md` 状态设为 `FAIL` 并上报人工，**不得推进到 Review**。
-3. **门控 (Gate)**：用户确认 `verify.md` 中各项均为 PASS。
-
-### 阶段 4：Review (代码审查)
-
-**目标**：确认代码是否正确、完整地解决了 `plan.md` 中的需求。
-
-1. **用户操作**：下达审查指令（如："审查 REQ-001"）。
-2. **AI 响应**：对照 `plan.md` 的验收标准逐项检查代码，在 `review.md` 中填写自检清单（架构合规、范围合规、页面结构合规、界面质量），状态设为 `PENDING_HUMAN_REVIEW`；同步顶层状态为 `REVIEWING`。
-3. **门控 (Gate)**：用户进行人工 Code Review。
-   - 若需修改：回复"要求修改：[具体问题]"。AI 将 `review.md` 置为 `CHANGES_REQUESTED`，
-     并把 `implement.md` 重置为 `IN_PROGRESS`、`verify.md` 重置为 `PENDING`、`tasks.md` 重置为 `DRAFT`，
-     顶层状态回到 `IMPLEMENTING`，退回 Implement 阶段。
-   - 若通过：回复："**Review 通过，状态改为 APPROVED**"。
-
-### 阶段 5：Commit (归档提交)
+### 阶段 4：Commit (归档提交)
 
 **目标**：原子性提交代码，完成生命周期。
 
 1. **用户操作**：下达提交指令（如："提交 REQ-001"）。
 2. **AI 响应**：
-   - **五项前置校验**（唯一需要五项全满足的阶段）：`plan.md`=`APPROVED` ∧ `tasks.md`=`DONE` ∧ `implement.md`=`COMPLETED` ∧ `verify.md`=`PASS` ∧ `review.md`=`APPROVED`。任一不满足即停止并**逐项报告当前值与期望值**。
+   - **三项前置校验**：`plan.md`=`APPROVED` ∧ `tasks.md`=`DONE` ∧ `implement.md`=`COMPLETED`。任一不满足即停止并逐项报告当前值与期望值。
    - 执行垃圾回收（清理未使用的 import、调试 `console.log`、死代码）。
    - 执行 `git add` 和 `git commit`（中文 commit message）。
    - 更新 `commit.md`，状态设为 `DONE`；同步顶层状态为 `COMMITTED`。
@@ -268,17 +239,15 @@ PLANNED ──► IMPLEMENTING ──► VERIFYING ──► VERIFIED ──► 
 
 1. 更新 `plan.md` 的 User Stories / AC，并在文末追加 `## 📝 Change Log`（**日期、内容、原因、影响范围**四要素）。
 2. `plan.md` 重置为 `DRAFT`，等待人工重新批准。
-3. **级联失效**（逐文件）：`tasks.md`→`DRAFT`、`implement.md`→`OUTDATED`、`verify.md`→`INVALIDATED`、`review.md`→`INVALIDATED`、顶层状态→`IMPLEMENTING`。
+3. **级联失效**（逐文件）：`tasks.md`→`DRAFT`、`implement.md`→`OUTDATED`、顶层状态→`IMPLEMENTING`。
 4. **代码冻结**：人工回复"PRD 批准"前，严禁修改 `src/` 下任何代码。
-5. 批准后，`OUTDATED` / `INVALIDATED` 由对应阶段重置回 `PENDING` 起算，重走 Tasks → Implement → Verify → Review。
+5. 批准后，`OUTDATED` 由 Implement 阶段重置回 `IN_PROGRESS` 起算，重走 Tasks → Implement。
 
 | 产物 | 变更后状态 | 含义 |
 | :--- | :--- | :--- |
 | `plan.md` | `DRAFT` | 契约已改，等待重新批准 |
 | `tasks.md` | `DRAFT` | 旧任务清单作废，需重新拆解 |
 | `implement.md` | `OUTDATED` | 旧实现作废 |
-| `verify.md` | `INVALIDATED` | 旧验证证据作废 |
-| `review.md` | `INVALIDATED` | 旧审查记录作废 |
 | `README.md` | `IMPLEMENTING` | 顶层状态随推导回退 |
 
 > 完整协议见 `.rudder/workflow/transitions.md` §4。
@@ -301,7 +270,7 @@ REQ-001 契约变更
 - **一跳一裁决**：变更传播一跳一跳走，每跳人裁决一次；上游未受影响时下游不受牵连。
 - **Agent 不得代替人裁决**：不得自行判定"未受影响"并摘除 `STALE`，也不得自行推进该 REQ 的任何阶段。
 
-> `STALE`（跨 REQ）与 `OUTDATED`/`INVALIDATED`（同一 REQ 内）是**两套机制**，
+> `STALE`（跨 REQ）与 `OUTDATED`（同一 REQ 内）是**两套机制**，
 > 区别见 `.rudder/analysis/dependency.md` §3。
 
 ---
@@ -317,8 +286,7 @@ REQ-001 契约变更
 | **路径 A：Import** | `/rudder-import 需求文档.docx` |
 | **路径 B：Plan** | `/rudder-plan 用户登录功能，需要邮箱密码和记住我` |
 | **Implement** | `/rudder-implement REQ-001` |
-| **Verify** | `/rudder-verify REQ-001` |
-| **Review** | `/rudder-review REQ-001` |
+| **实施后调整** | `/rudder-adjust REQ-001 修改内容` |
 | **Commit** | `/rudder-commit REQ-001` |
 | **Change** (异常分支) | `/rudder-change REQ-001 "增加忘记密码入口"` |
 
@@ -331,8 +299,7 @@ REQ-001 契约变更
 | **路径 A：Import** | "调用 rudder-import 技能，导入需求文档.docx。" |
 | **路径 B：Plan** | "调用 rudder-plan 技能。我想做一个用户登录功能，需要邮箱密码和记住我。" |
 | **Implement** | "PRD 已批准。调用 rudder-implement 技能，开始实施 REQ-001。" |
-| **Verify** | "调用 rudder-verify 技能，验证 REQ-001 的代码并生成验证证据。" |
-| **Review** | "调用 rudder-review 技能，检查 REQ-001 是否符合 PRD 验收标准。" |
+| **实施后调整** | "调用 rudder-adjust 技能，处理 REQ-001 的实施后修改。" |
 | **Commit** | "Review 已通过。调用 rudder-commit 技能，提交并归档 REQ-001。" |
 | **Change** (异常分支) | "调用 rudder-change 技能。REQ-001 需要增加一个忘记密码入口。" |
 

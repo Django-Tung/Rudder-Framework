@@ -39,8 +39,6 @@ Rudder 的规则分四层，各自回答一个不同的问题，**不重叠**：
 │   ├── structure.md           ←   7 文件结构与 README.md frontmatter schema
 │   └── acceptance.md          ←   AC 编号规范
 ├── implementation/            ← 三阶段产物规格
-├── verification/
-├── review/
 ├── agents/                    ← 各 runtime 的读取约定
 │   └── claude-code.md
 └── templates/                 ← 新文件的初值来源（与 states.md 的重置表同源）
@@ -53,7 +51,7 @@ Rudder 的规则分四层，各自回答一个不同的问题，**不重叠**：
 | 一个需求从提出到归档要经过哪些阶段 | [`workflow/lifecycle.md`](workflow/lifecycle.md) |
 | 某个文件的 `status` 能取哪些值、顶层状态怎么推导 | [`workflow/states.md`](workflow/states.md) |
 | 现在能不能进入下一阶段 | [`workflow/gates.md`](workflow/gates.md) |
-| 验证失败 / 审查打回 / 需求变更时怎么办 | [`workflow/transitions.md`](workflow/transitions.md) |
+| 实施检查失败 / 需求变更时怎么办 | [`workflow/transitions.md`](workflow/transitions.md) |
 | 代码与技术栈的硬性约束 | [`constitution.md`](constitution.md) |
 | 把一份外部文档导入成需求 | [`import/sources.md`](import/sources.md) → [`analysis/decomposition.md`](analysis/decomposition.md) |
 | REQ 目录里该有哪些文件 | [`requirement/structure.md`](requirement/structure.md) |

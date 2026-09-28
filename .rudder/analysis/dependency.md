@@ -24,16 +24,17 @@ REQ 真正依赖的是依赖方「**定下来要做什么**」（`plan.md` 中�
 - 创建或修改 REQ 时，`README.md` 的 `deps` **必须如实**记录跨 REQ 的契约依赖；
 - **禁止**为省去登记而遗漏已知依赖——漏登记的依赖不会消失，只会在变更时**静默地**让下游失真。
 
-## 3. `STALE` 与 `OUTDATED` / `INVALIDATED` 是两套机制
+## 3. `STALE` 与 `OUTDATED` 是两套机制
 
 这两个概念容易混淆，在此**显式区分**：
 
-| | `OUTDATED`（implement）/ `INVALIDATED`（verify、review） | `STALE` |
+| | `OUTDATED`（implement） | `STALE` |
 |---|---|---|
 | **触发** | **同一 REQ 内**的契约变更 | **跨 REQ** 的上游变更 |
 | **落盘** | 对应**产物文件**的 `status` | `README.md` 的 `stale` **布尔字段** |
 | **判定者** | 机器（变更即作废，无条件） | 机器标记，**人裁决**是否真受影响 |
 | **后果** | 该产物作废，回对应阶段重做 | 未受影响则重新 verify 后摘除；真受影响才回 `IMPLEMENTING` |
+| **后果** | 该产物作废，回 Implement 重做 | 未受影响则完成 Implement 检查后摘除；真受影响才回 `IMPLEMENTING` |
 
 **`STALE` 不进入顶层 `status` 枚举**——它是与阶段正交的标记（见 [`../workflow/states.md`](../workflow/states.md) §2.2）。
 
@@ -61,7 +62,7 @@ REQ-001 契约变更
   ↓ 机器：把闭包内每个 REQ 的 README.md 标 stale: true（stale_reason = REQ-001）
   ↓ 人：对每个 STALE 判断「契约是否真受影响」
        ├─ 没受影响 → 重新跑 verify 通过 → stale: false（清空 reason / since）
-       └─ 真受影响 → 标 OUTDATED / INVALIDATED（transitions §4）
+        └─ 真受影响 → 标 OUTDATED（transitions §3）
                     → 顶层 status 回 IMPLEMENTING
                     → 把它的下游再标 STALE（下一跳，再裁决一次）
 ```
@@ -79,7 +80,7 @@ REQ-001 契约变更
 | 裁决结论 | 动作 |
 |---|---|
 | **未受影响** | 重新执行 Verify 并通过后，摘除 `STALE`（`stale: false`，清空 `stale_reason` 与 `stale_since`） |
-| **真受影响** | 走完整变更控制协议：`implement.md` → `OUTDATED`、`verify.md` / `review.md` → `INVALIDATED`、`plan.md` → `DRAFT`；顶层 `status` 随推导回到 `IMPLEMENTING`；随即把**它的下游**标 `STALE` |
+| **真受影响** | 走完整变更控制协议：`implement.md` → `OUTDATED`、`plan.md` → `DRAFT`；顶层 `status` 随推导回到 `IMPLEMENTING`；随即把**它的下游**标 `STALE` |
 
 ### 5.3 Agent 不得代替人裁决
 

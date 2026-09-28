@@ -56,8 +56,8 @@ Claude Code 通过**斜杠命令**触发技能，参数由 `argument-hint` 声�
 |---|---|
 | `/rudder-plan` | `[REQ-ID or Description]` |
 | `/rudder-implement` | `[REQ-ID]` |
-| `/rudder-verify` | `[REQ-ID]` |
-| `/rudder-review` | `[REQ-ID]` |
+| `/rudder-plan-confirm` | `[REQ-ID]` |
+| `/rudder-adjust` | `[REQ-ID] [Change Description]` |
 | `/rudder-commit` | `[REQ-ID]` |
 | `/rudder-change` | `[REQ-ID] [Change Description]` |
 | `/rudder-import` | `[Document Path]` |
@@ -69,7 +69,7 @@ Claude Code 通过**斜杠命令**触发技能，参数由 `argument-hint` 声�
 ## 5. 输出与验证约定
 
 - **交互语言**：所有澄清问题、报告、批准提示用**简体中文**。
-- **证据**：不得口头声称"已通过"。Verify 阶段必须把命令的完整终端输出写入 `verify.md`。
+- **证据**：不得口头声称"已通过"。Implement 阶段必须把命令的完整终端输出写入 `implement.md`。
 - **状态同步**：每次阶段动作后**立刻**更新产物 `status` **与** `README.md` 顶层 `status`，
   然后跑 `npm run check:req` 确认一致。
 - **变更纪律**：范围变更走 `/rudder-change`，**不得**就地改代码

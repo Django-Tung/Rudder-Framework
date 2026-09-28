@@ -1,0 +1,41 @@
+---
+claude:
+  description: Confirm an ambiguous PRD approval and promote plan.md after all clarifications are complete.
+  argument-hint: [REQ-ID]
+hermes:
+  name: rudder-plan-confirm
+  description: Confirm an ambiguous PRD approval and promote plan.md after all clarifications are complete.
+  triggers:
+    - 确认 PRD
+    - 批准 PRD
+    - rudder-plan-confirm
+    - 确认需求方案
+---
+
+> 这是 Plan 阶段的确认命令，规则见 `.rudder/workflow/lifecycle.md`、`.rudder/workflow/gates.md`。
+
+## 目标
+
+处理 `/rudder-plan` 的确认不清楚场景。只有用户明确确认且所有重大澄清问题已解决时，才允许将 `plan.md` 置为 `APPROVED`。
+
+<!-- hermes-only:start -->
+## 参数提取
+
+从用户输入中提取目标 REQ-ID。缺少时必须用中文询问，不得猜测。
+<!-- hermes-only:end -->
+
+## 执行步骤
+
+1. 读取目标 REQ 的 `README.md`、`plan.md`、`MASTER-PRD.md` 及依赖方的 `plan.md`。
+2. 汇总 `plan.md` 中的待澄清问题、验收标准、页面结构和技术契约。
+3. 检查所有重大澄清问题、UI 主风格、范围、依赖和边界是否已由用户确认。
+4. 如果仍有未确认项，列出原因并保持 `plan.md = DRAFT`、`README.md = PLANNED`，停止。
+5. 如果用户明确批准且无阻断项，将 `plan.md` 设置为 `APPROVED`，同步 `README.md = PLANNED`，运行 `npm run check:req`。
+6. 通过后提示用户执行 `/rudder-implement REQ-XXX`。
+
+## 约束
+
+- 不修改 `src/`。
+- 不得自行推断或补全业务规则。
+- `plan.md = APPROVED` 只能由用户明确批准触发。
+- 所有交互与报告必须使用简体中文。

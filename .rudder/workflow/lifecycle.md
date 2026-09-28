@@ -11,7 +11,7 @@ Rudder 同时维护**两层**状态，二者职责不同：
 | 层 | 承载处 | 回答的问题 |
 |---|---|---|
 | **REQ 顶层状态** | `requirements/REQ-XXX-<kebab-name>/README.md` 的 `status` | 这个需求**整体**走到哪了 |
-| **阶段产物状态** | 6 个阶段产物各自的 frontmatter `status` | 这个**文件**自身的流转状态 |
+| **阶段产物状态** | 3 个阶段产物各自的 frontmatter `status` | 这个**文件**自身的流转状态 |
 
 顶层状态**由阶段产物状态推导得出**，`README.md` 中存储的只是它的持久化副本；
 两者的一致性由 `scripts/check-req.js` 断言。推导表见 [`states.md`](states.md) §2。
@@ -34,11 +34,9 @@ Rudder 同时维护**两层**状态，二者职责不同：
 | 1. Plan | `plan.md` | `/rudder-plan` | `rudder-plan` |
 | 2. Tasks | `tasks.md` | `/rudder-implement`（起始步骤） | `rudder-implement` |
 | 3. Implement | `implement.md` | `/rudder-implement` | `rudder-implement` |
-| 4. Verify | `verify.md` | `/rudder-verify` | `rudder-verify` |
-| 5. Review | `review.md` | `/rudder-review` | `rudder-review` |
-| 6. Commit | `commit.md` | `/rudder-commit` | `rudder-commit` |
+| 4. Commit | `commit.md` | `/rudder-commit` | `rudder-commit` |
 
-每个 REQ 目录完整含 **7 个**文件（上述 6 个产物 + 承载顶层状态的 `README.md`），
+每个 REQ 目录完整含 **5 个**文件（上述 4 个产物 + 承载顶层状态的 `README.md`），
 结构见 [`../requirement/structure.md`](../requirement/structure.md)。
 
 > **Archive 不是阶段**，是 Commit 的**后置动作**（见 [`transitions.md`](transitions.md) §6）。

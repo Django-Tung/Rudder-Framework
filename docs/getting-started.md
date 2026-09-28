@@ -1,6 +1,6 @@
 # Rudder Framework 新手教程
 
-本教程带你完成一次从安装依赖到启动项目、选择需求入口和验证代码的完整流程。
+本教程带你完成一次从安装依赖到启动项目、选择需求入口和完成代码检查的完整流程。
 
 ## 使用路径总览
 
@@ -14,7 +14,7 @@
 两条路径都会在 `plan.md` 批准后进入同一条实施流程：
 
 ```text
-Plan → Tasks → Implement → Verify → Review → Commit
+Plan → Tasks → Implement → Commit
 ```
 
 ## 1. 准备环境
@@ -129,14 +129,12 @@ Agent 会先提出澄清问题，然后在 `requirements/REQ-XXX-<name>/` 下生
 PRD 批准，状态改为 APPROVED
 ```
 
-## 6. 实施和验证需求
+## 6. 实施和提交需求
 
 需求计划批准后，按顺序执行：
 
 ```text
 /rudder-implement REQ-001
-/rudder-verify REQ-001
-/rudder-review REQ-001
 /rudder-commit REQ-001
 ```
 
@@ -147,8 +145,7 @@ PRD 批准，状态改为 APPROVED
 | Plan | 明确范围、用户场景和验收标准 |
 | Tasks | 将验收标准拆成可执行任务 |
 | Implement | 按 Types、Mocks、Services、UI 顺序实施 |
-| Verify | 运行类型检查、Lint、Build 和规则校验 |
-| Review | 对照验收标准进行人工审查 |
+| Implement | 运行类型检查、Lint、Build 和规则校验，并记录到 `implement.md` |
 | Commit | 提交代码并归档需求证据 |
 
 不要在未批准 PRD 时直接修改 `src/`。如果需求范围发生变化，使用：

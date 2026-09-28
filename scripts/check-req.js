@@ -3,7 +3,7 @@
  *
  * 断言四组不变量：
  *   A. 拆解完备与真实完成 —— I1（每条 AC 被任务覆盖）、I2（无虚假完成）、tasks.md status 一致性。
- *   B. `README.md` 顶层状态 —— 必填字段齐全，且 `status` 等于由 6 个阶段产物推导的结果
+ *   B. `README.md` 顶层状态 —— 必填字段齐全，且 `status` 等于由 3 个阶段产物推导的结果
  *      （推导表见 .rudder/workflow/states.md §2）。不符时报出**期望值与实际值**。
  *   C. 依赖图 —— 依赖边**只从 MASTER-PRD.md 的 AUTO-INDEX 依赖列读取**：
  *      悬挂依赖、自依赖、环、README 与索引的漂移。
@@ -30,21 +30,15 @@ const END = '<!-- END:AUTO-INDEX -->';
 const TOP_STATUSES = [
   'PLANNED',
   'IMPLEMENTING',
-  'VERIFYING',
-  'VERIFIED',
-  'REVIEWING',
-  'REVIEWED',
+  'IMPLEMENTED',
   'COMMITTED',
 ];
 
 /** 顶层 `status` 推导规则，**顺序即判定顺序**（自上而下，首个满足者胜出）。 */
 const TOP_STATUS_RULES = [
   { status: 'PLANNED', test: (s) => ['DRAFT', 'APPROVED'].includes(s.plan) && s.impl === 'PENDING' },
-  { status: 'IMPLEMENTING', test: (s) => ['IN_PROGRESS', 'OUTDATED'].includes(s.impl) || s.review === 'CHANGES_REQUESTED' },
-  { status: 'VERIFYING', test: (s) => s.impl === 'COMPLETED' && ['PENDING', 'FAIL'].includes(s.verify) },
-  { status: 'VERIFIED', test: (s) => s.verify === 'PASS' && s.review === 'PENDING' },
-  { status: 'REVIEWING', test: (s) => s.verify === 'PASS' && s.review === 'PENDING_HUMAN_REVIEW' },
-  { status: 'REVIEWED', test: (s) => s.review === 'APPROVED' && s.commit === 'PENDING' },
+  { status: 'IMPLEMENTING', test: (s) => ['IN_PROGRESS', 'OUTDATED'].includes(s.impl) },
+  { status: 'IMPLEMENTED', test: (s) => s.impl === 'COMPLETED' && s.commit === 'PENDING' },
   { status: 'COMMITTED', test: (s) => s.commit === 'DONE' },
 ];
 
@@ -232,8 +226,6 @@ function checkArtifacts(dir) {
   const artifacts = {
     plan: readStatus(planPath),
     impl: readStatus(implPath),
-    verify: readStatus(join(dir, 'verify.md')),
-    review: readStatus(join(dir, 'review.md')),
     commit: readStatus(join(dir, 'commit.md')),
   };
 
@@ -245,7 +237,7 @@ function checkArtifacts(dir) {
     if (!expected) {
       errors.push(
         `无法推导顶层 status：产物状态组合不匹配任何规则（plan=${artifacts.plan} impl=${artifacts.impl} ` +
-          `verify=${artifacts.verify} review=${artifacts.review} commit=${artifacts.commit}）`,
+          `commit=${artifacts.commit}）`,
       );
     } else if (expected.status !== readme.status) {
       errors.push(`顶层 status 不一致：期望 ${expected.status}，实际 ${readme.status}`);

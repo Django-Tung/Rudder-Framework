@@ -29,8 +29,6 @@ Extract the target REQ-ID and the description of the change from user input. If 
    - `plan.md` -> `DRAFT` (awaiting human re-approval)
    - `tasks.md` -> `DRAFT` (old task breakdown must be redone)
    - `implement.md` -> `OUTDATED` (clear the core implementation summary)
-   - `verify.md` -> `INVALIDATED` (clear the verification log)
-   - `review.md` -> `INVALIDATED` (clear the review record)
    - `README.md` -> `status: IMPLEMENTING` (derived value, see `.rudder/workflow/states.md`)
 3. **Code Freeze**:
    - **STRICT CONSTRAINT**: **FORBIDDEN** to modify any code under `src/` before the user replies "PRD 批准".

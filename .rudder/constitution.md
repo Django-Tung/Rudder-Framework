@@ -49,8 +49,8 @@
 
 - 任何代码变更后，**必须**自动运行 `npm run build` 与 `npm run lint`（或 `npm run typecheck`）。
 - 若失败，读取终端报错、自动修复、重跑，直到 0 错误。
-- **逃生舱**：连续 3 轮仍失败时**必须停止**，将 `verify.md` 状态置为 `FAIL` 并上报人工，
-  不得继续推进（详见 [`workflow/transitions.md`](workflow/transitions.md) §1）。
+- **逃生舱**：连续 3 轮仍失败时**必须停止**，将 `implement.md` 保持为 `IN_PROGRESS` 并上报人工，
+  不得将实施标记为完成（详见 [`workflow/transitions.md`](workflow/transitions.md) §1）。
 
 ## 5. 🧹 垃圾回收
 
@@ -58,7 +58,7 @@
 
 ## 6. 📚 技能权威源约定
 
-技能（`rudder-plan` / `rudder-implement` / `rudder-verify` / `rudder-review` /
+技能（`rudder-plan` / `rudder-plan-confirm` / `rudder-implement` / `rudder-adjust` /
 `rudder-commit` / `rudder-change` / `rudder-import`）遵循**单一源 + 双投影**：
 
 | 位置 | 性质 |

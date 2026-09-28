@@ -52,8 +52,6 @@ project-root/
 │   │   ├── plan.md                # 需求规划（用户故事、BDD 验收标准、UI 契约、对总纲的增量声明）
 │   │   ├── tasks.md               # [新增] 细粒度执行任务清单（Checkbox 格式，可机器校验）
 │   │   ├── implement.md           # 代码实施记录与文件变更摘要
-│   │   ├── verify.md              # 机器验证证据
-│   │   ├── review.md              # 代码审查记录
 │   │   └── commit.md              # 归档提交记录（含 archived / archived_at / archive_path）
 │   ├── _inbox/                    # [新增] 导入中间产物（归一化 Markdown + 导入报告），脚本扫描时跳过 `_` 前缀
 │   └── archive/                   # [新增] 已完成需求归档目录（格式：<YYYY-MM>-REQ-XXX-<kebab-name>/）
@@ -62,7 +60,7 @@ project-root/
 │   ├── policies/
 │   │   ├── core.md                # 核心工程规范（含依赖豁免条款）
 │   │   └── import.md              # [新增] 多格式需求导入解析规则
-│   └── templates/                 # 6 个模板（新增 tasks.md）
+│   └── templates/                 # 4 个阶段模板（新增 tasks.md）
 └── scripts/
     ├── sync-master-prd.js         # [新增] 确定性索引同步脚本（零依赖、幂等、支持 --check）
     ├── check-tasks.js             # [新增] tasks.md 不变量校验（I1 / I2）
@@ -72,14 +70,14 @@ project-root/
 
 ---
 
-## 四、 状态机（6 阶段 + 归档后置动作）
+## 四、 状态机（4 阶段 + 归档后置动作）
 
 权威定义在 `.rudder/lifecycle.md`。要点：
 
-- **6 阶段**：`Plan → Tasks → Implement → Verify → Review → Commit`。
+- **4 阶段**：`Plan → Tasks → Implement → Commit`。
 - `Tasks` 阶段由 `/rudder-implement` 的**起始步骤**执行（按 `plan.md` 拆解 `tasks.md`），不设独立命令。
 - **Archive 是 Commit 的后置动作**（`commit.md = DONE` 后触发 `git mv` + 索引同步），不是阶段。
-- **Commit 前置扩为 5 项**：`plan=APPROVED ∧ tasks=DONE ∧ implement=COMPLETED ∧ verify=PASS ∧ review=APPROVED`。
+- **Commit 前置为 3 项**：`plan=APPROVED ∧ tasks=DONE ∧ implement=COMPLETED`。
 
 ---
 
@@ -96,7 +94,7 @@ project-root/
 
 1. 新增 `requirements/MASTER-PRD.md` 总纲与需求索引（含脚本独占维护块）。
 2. 新增 `.rudder/templates/tasks.md` 模板，并引入 I1/I2 两个可机器判定的不变量。
-3. 更新 `.rudder/lifecycle.md` 为 6 阶段 + 归档后置动作。
+3. 更新 `.rudder/workflow/lifecycle.md` 为 4 阶段 + 归档后置动作。
 
 ### 🟡 P1 — 多格式需求导入与解析引擎
 
@@ -114,9 +112,9 @@ project-root/
 ## 六、 AI 行为约束规范（Prompt 策略）
 
 1. **单一职责与上下文隔离**：处理 `REQ-XXX` 的 **Plan→Commit 窗口**内，仅允许读取 `MASTER-PRD.md` 和当前 `REQ-XXX` 目录。**`/rudder-import` 阶段除外**（须同时读外部文档与总纲才能判定全局/局部）。严禁跨需求修改代码或文档。
-2. **证据优于承诺**：AI 不得口头宣称"任务已完成"。`tasks.md` 的 I1/I2 校验、`verify.md` 中的构建日志，是推进到下一阶段的凭证。
+2. **证据优于承诺**：AI 不得口头宣称"任务已完成"。`tasks.md` 的 I1/I2 校验、`implement.md` 中的构建日志，是提交前的凭证。
 3. **增量声明原则**：`plan.md` 涉及全局规则变更时，以"增量声明"形式标注（如 `> 需同步更新 MASTER-PRD.md 的全局技术契约`），由归档脚本统一处理，**禁止 AI 直接覆写 `MASTER-PRD.md` 的索引块外内容**。
-4. **防幻觉与死循环控制**：`Verify` 阶段自动化校验连续失败 3 次，AI 必须停止自动修复，标记 `FAIL` 并上报人工。
+4. **防幻觉与死循环控制**：Implement 阶段自动化校验连续失败 3 次，AI 必须停止自动修复并上报人工。
 
 ---
 

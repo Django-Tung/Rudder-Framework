@@ -40,6 +40,24 @@ PENDING
 
 无。
 
+## 机器检查证据 (Machine Checks)
+
+按顺序记录以下命令的完整终端输出：
+
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
+- `npm run check:skills`
+- `npm run check:req`
+
+所有命令通过后，`implement.md` 才能设置为 `COMPLETED`。
+
+## 修复记录 (Fix Log)
+
+| 轮次 | 失败命令 | 错误摘要 | 修复措施 | 结果 |
+|---|---|---|---|---|
+| 1 | [命令] | [摘要] | [措施] | [结果] |
+
 ## 遇到的问题与解决方案 (Issues & Resolutions)
 | 问题 | 原因 | 解决方案 |
 |------|------|---------|
@@ -51,3 +69,4 @@ PENDING
 - [ ] 所有 Services 已实现
 - [ ] 所有 UI 组件已完成（含 Loading/Error/Empty 状态）
 - [ ] 所有界面文案为简体中文
+- [ ] typecheck、lint、build、check:skills、check:req 全部通过

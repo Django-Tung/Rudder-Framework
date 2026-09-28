@@ -4,7 +4,7 @@
  * - 零第三方依赖（Node 内置 + 正则）。
  * - 扫描 requirements/ 下的 REQ 目录 与 requirements/archive/，跳过 `_` 前缀目录。
  * - 索引的 `状态` / `依赖` / `来源` 三列**从各 REQ 的 README.md 读取**（单一真相源，
- *   见 .rudder/requirement/structure.md §4）；`Phase` 列由 6 个阶段产物推导，仅供人读。
+ *   见 .rudder/requirement/structure.md §4）；`Phase` 列由 3 个阶段产物推导，仅供人读。
  * - 幂等；`--check` 模式只断言索引与事实一致，不写入。
  *
  * 用法：
@@ -58,7 +58,7 @@ function listReqs() {
 }
 
 /**
- * 由 6 个阶段产物推导「当前阶段」列。
+ * 由 3 个阶段产物推导「当前阶段」列。
  *
  * 注意：**这不是 `状态` 列的来源**——`状态` 一律取自 `README.md`（见文件头注释）。
  * 本列保留阶段细分（Plan / Tasks 之分、变更回滚），供人快速定位进度。
@@ -67,20 +67,14 @@ function derivePhase(req) {
   const plan = readFrontmatter(join(req.dir, 'plan.md'));
   const tasks = readFrontmatter(join(req.dir, 'tasks.md'));
   const impl = readFrontmatter(join(req.dir, 'implement.md'));
-  const verify = readFrontmatter(join(req.dir, 'verify.md'));
-  const review = readFrontmatter(join(req.dir, 'review.md'));
   const commit = readFrontmatter(join(req.dir, 'commit.md'));
 
   if (commit.status === 'DONE') return '完成';
-  if (verify.status === 'FAIL') return 'Verify';
-  if (review.status === 'CHANGES_REQUESTED') return 'Review';
   // OUTDATED 表示需求变更后旧实现作废、尚未重新实施
   if (impl.status === 'OUTDATED') return '变更回滚';
   if (plan.status !== 'APPROVED') return 'Plan';
   if (tasks.status !== 'DONE') return 'Tasks';
   if (impl.status !== 'COMPLETED') return 'Implement';
-  if (verify.status !== 'PASS') return 'Verify';
-  if (review.status !== 'APPROVED') return 'Review';
   return 'Commit';
 }
 

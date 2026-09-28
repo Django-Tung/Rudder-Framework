@@ -1,6 +1,6 @@
 # Rudder 工作流优化方案
 
-> 状态：待人工确认
+> 状态：已实施
 > 日期：2026-09-24
 > 范围：Plan 确认、实施流程、实施后变更
 
@@ -199,16 +199,16 @@ requirements/REQ-XXX-<kebab-name>/
 
 1. 读取 `plan.md`、`tasks.md`、`implement.md` 和用户的修改描述；
 2. 判断修改是否影响需求契约；
-3. 用中文展示影响分析并请求用户确认；
-4. 根据确认结果进入对应路径。
+3. 不影响需求契约时，直接修改代码并重新执行实施完成检查；
+4. 影响需求契约时，用中文说明原因，提示用户使用 `/rudder-change`，然后终止命令。
 
 ### 8.3 不改变契约的小修改
 
 如果修改只涉及实现细节，且不改变 AC、页面结构、数据模型、依赖或范围：
 
-- 直接更新任务清单和实施记录；
+- 直接修改代码；
+- 更新任务清单和实施记录；
 - 将 `implement.md` 置为 `IN_PROGRESS`；
-- 允许用户再次执行 `/rudder-implement REQ-XXX`；
 - 重新执行实施完成检查；
 - 通过后恢复 `implement.md = COMPLETED`。
 
@@ -216,16 +216,10 @@ requirements/REQ-XXX-<kebab-name>/
 
 如果修改影响 AC、页面结构、技术契约、依赖或 Non-Goals：
 
-- 更新 `plan.md` 并追加 Change Log；
-- `plan.md = DRAFT`；
-- `tasks.md = DRAFT`；
-- `implement.md = OUTDATED`；
-- 冻结 `src/` 修改；
-- 同步 REQ 顶层状态为 `IMPLEMENTING`；
-- 请求用户重新确认 PRD；
-- 确认后重新执行 `/rudder-implement`。
+- 明确提示用户使用 `/rudder-change REQ-XXX [变更内容]`；
+- 终止当前 `rudder-adjust` 命令，不修改 `src/` 或任何需求产物。
 
-该路径复用现有 `rudder-change` 的需求变更原则，但通过 `rudder-adjust` 提供实施后入口。
+后续由 `rudder-change` 按需求变更原则更新契约、使证据失效并重新进入确认流程。
 
 ## 9. Commit 调整
 
@@ -262,8 +256,8 @@ plan = APPROVED
 - `.rudder/templates/README.md`
 - `.rudder/templates/implement.md`
 - `.rudder/templates/commit.md`
-- 删除或废弃 `.rudder/templates/verify.md`
-- 删除或废弃 `.rudder/templates/review.md`
+- 删除 `.rudder/templates/verify.md`
+- 删除 `.rudder/templates/review.md`
 - `scripts/check-req.js`
 - `README.md`
 - `CLAUDE.md` 与 `AGENTS.md` 中引用的流程说明（如有过时内容）
@@ -271,13 +265,10 @@ plan = APPROVED
 
 现有 `requirements/REQ-*` 目录需要单独迁移，不能在规则修改时静默改变历史证据。
 
-## 11. 待确认事项
+## 11. 已确认事项
 
-以下内容在正式实施方案前仍需确认：
+1. 采用独立的新命令 `/rudder-plan-confirm REQ-XXX`，用于处理 `rudder-plan` 中确认不清楚的情况。
+2. `rudder-adjust` 处理不影响需求契约的修改时，可以直接修改代码并重新执行实施完成检查；如果影响需求契约，提示用户使用 `/rudder-change`，然后终止当前命令。
+3. 删除独立的 Verify 与 Review 阶段、对应标准命令及新 REQ 的 `verify.md`、`review.md` 产物。现有 REQ 中同名文件的必要历史信息迁移后，删除原文件。
 
-1. `rudder-plan-confirm` 是否采用独立命令名，还是作为 `rudder-plan` 的重复调用模式？
-2. `rudder-adjust` 对不改变契约的小修改，是否允许命令直接修改代码，还是必须再次由用户执行 `/rudder-implement`？
-3. 现有已创建的 `verify.md` 与 `review.md` 是迁移为历史附件后删除，还是保留在现有 REQ 目录中并仅对新 REQ 使用 5 文件结构？
-4. 现有 `REQ-001` 是否作为迁移样例一起调整，还是只修改框架规则，不改当前需求目录？
-
-在这些事项确认前，不修改框架规则和现有需求产物。
+以上事项确认后，可以按第 10 节实施框架规则、技能和脚本的同步修改。

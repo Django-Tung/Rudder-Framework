@@ -12,7 +12,7 @@ stale_since: ""
 # [需求名称]（REQ-XXX）
 
 > 本文件承载 REQ 级元数据。frontmatter 字段 schema 见 `.rudder/requirement/structure.md` §2。
-> `status` 是**派生值**，由 6 个阶段产物的 `status` 推导得出（推导表见 `.rudder/workflow/states.md` §2），
+> `status` 是**派生值**，由 3 个阶段产物的 `status` 推导得出（推导表见 `.rudder/workflow/states.md` §2），
 > 由 `npm run check:req` 断言一致——**每次阶段动作后必须同步更新**。
 
 ## 1. 需求概要
@@ -23,7 +23,7 @@ stale_since: ""
 | 名称 | [中文需求名称] |
 | 来源 | [IMP-YYYYMMDD-NNN 或 `人工登记`] |
 | 依赖 | [REQ-YYY，无则填「无」] |
-| 当前阶段 | [Plan / Tasks / Implement / Verify / Review / Commit] |
+| 当前阶段 | [Plan / Tasks / Implement / Commit] |
 
 ## 2. 产物索引
 
@@ -31,9 +31,7 @@ stale_since: ""
 |---|---|---|
 | [`plan.md`](plan.md) | `DRAFT` | 需求规划（PRD + 技术契约） |
 | [`tasks.md`](tasks.md) | `DRAFT` | 任务清单 |
-| [`implement.md`](implement.md) | `PENDING` | 代码实施记录 |
-| [`verify.md`](verify.md) | `PENDING` | 机器验证证据 |
-| [`review.md`](review.md) | `PENDING` | 代码审查记录 |
+| [`implement.md`](implement.md) | `PENDING` | 代码实施与机器检查记录 |
 | [`commit.md`](commit.md) | `PENDING` | 提交与归档记录 |
 
 ## 3. STALE 裁决记录

@@ -8,7 +8,7 @@ created: YYYY-MM-DD
 
 # 📋 需求规划 (PRD): <需求简短名称>
 
-> ⚠️ **AI 阅读指南**：本文档是后续 Implement/Verify/Review 的唯一事实来源 (Single Source of Truth)。在编码前，必须确保所有带 `[ ]` 的待澄清问题已解决，且所有技术契约已明确。
+> ⚠️ **AI 阅读指南**：本文档是后续 Implement 的唯一事实来源 (Single Source of Truth)。在编码前，必须确保所有带 `[ ]` 的待澄清问题已解决，且所有技术契约已明确。
 
 ## 1. 业务背景与目标 (Context & Goals)
 - **业务背景**：[简述为什么要做这个功能，解决什么痛点]
@@ -22,7 +22,7 @@ created: YYYY-MM-DD
   - **场景 B (异常流/边缘情况)**：...
 
 ## 3. 验收标准 (BDD Acceptance Criteria)
-> 必须使用 Given-When-Then 格式，这是 Verify 阶段自动化测试和 Review 阶段人工核对的唯一基准。
+> 必须使用 Given-When-Then 格式，这是 Implement 完成检查的唯一基准。
 
 - **AC-1: [功能点名称]**
   - **Given** [前置条件，如：用户处于登录页且网络正常]
@@ -88,7 +88,7 @@ export interface IUser {
 ---
 
 ## 📝 变更记录 (Change Log)
-> ⚠️ 发生需求变更时，必须在此追加记录，并将顶部 `status` 重置为 `DRAFT`，同时级联回滚：`tasks.md → DRAFT`、`implement.md → OUTDATED`、`verify.md → INVALIDATED`、`review.md → INVALIDATED`。
+> ⚠️ 发生需求变更时，必须在此追加记录，并将顶部 `status` 重置为 `DRAFT`，同时级联回滚：`tasks.md → DRAFT`、`implement.md → OUTDATED`。
 
 | 日期 | 变更内容简述 | 变更原因/背景 | 影响范围评估 |
 | :--- | :--- | :--- | :--- |

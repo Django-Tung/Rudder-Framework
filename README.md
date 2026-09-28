@@ -325,9 +325,9 @@ npm run sync:master -- --check   # 只校验索引与事实是否一致，不写
 
 > **输入**（若确需 AI 汇总）："运行 `npm run sync:master` 更新索引，并读取 `requirements/MASTER-PRD.md` 的索引块，汇报每个需求的当前状态与依赖。"
 
-### 场景 B：Verify 阶段持续失败
+### 场景 B：Implement 阶段检查失败
 
-> **输入**："我看到 `verify.md` 状态是 FAIL。请读取终端的报错日志，分析原因，修复代码，并重新执行 verify 流程，直到状态变为 PASS。"
+> **输入**："Implement 检查失败。请根据完整终端日志定位并修复，重新执行失败的检查；累计 3 轮仍失败时，按异常流转规则记录失败命令与修复尝试并停止报告。"
 
 ### 场景 C：需求中途变更 (Scope Creep)
 
@@ -339,11 +339,11 @@ npm run sync:master -- --check   # 只校验索引与事实是否一致，不写
 
 AI 会更新 `plan.md`（含 Change Log）、退回 `DRAFT`，并级联失效下游证据。此后 AI **必须停手**，直到你回复"**PRD 批准**"。
 
-### 场景 D：代码偏离预期，需要重置
+### 场景 D：代码偏离预期，需要整体回滚
 
-> **输入**："当前 REQ-001 的代码实现偏离了预期。请执行 `git reset --hard HEAD~1` 回滚到上一个 commit，并将 `tasks.md` 重置为 DRAFT、`implement.md` / `verify.md` / `review.md` 重置为 PENDING，`plan.md` 保持 APPROVED 不变，我们从 Tasks 阶段重新实施。"
+> **输入**："当前 REQ-001 的实现偏离预期。请按 `.rudder/workflow/transitions.md` §5 执行整体回滚：只撤销该 REQ 的实现变更，保留契约；将 `tasks.md` 重置为 `DRAFT`、`implement.md` 重置为 `PENDING`、`plan.md` 保持 `APPROVED`，并将顶层状态同步为 `PLANNED`，然后从 Tasks 阶段重新开始。"
 >
-> 注意与场景 C 的区别：**整体回滚**（本节）是丢弃实现但契约不变，故 `plan.md` 保持 `APPROVED`，状态回到**初值** `PENDING`；**需求变更**（场景 C）是契约本身变了，故 `plan.md` 退回 `DRAFT`，下游进入 `OUTDATED`/`INVALIDATED` **失效态**。
+> **整体回滚**是丢弃实现但契约不变；**需求变更**（场景 C）是契约本身改变，必须将 `plan.md` 退回 `DRAFT`，并按变更协议使下游证据失效。回滚时不要使用会丢弃其他工作区改动的整体重置命令。
 
 ### 场景 E：收到不支持的文档格式
 
@@ -354,8 +354,8 @@ AI 会更新 `plan.md`（含 Change Log）、退回 `DRAFT`，并级联失效下
 
 ## 7. 最佳实践与注意事项
 
-1. **让 AI 自己修 Bug**：当 AI 在 Implement 或 Verify 阶段写出有问题的代码时，**不要手动帮它修改**。指出问题或让它看报错日志，强制它触发自动修复闭环。
-2. **只看 `verify.md`，不听口头承诺**：如果 AI 在聊天中说"已经测试通过"，但 `verify.md` 中没有 `npm run build` 的 PASS 记录，视为未通过。
+1. **检查失败按闭环处理**：Implement 检查失败时提供完整报错日志；按异常流转规则修复并重跑，最多 3 轮。仍失败就记录尝试并停止，不以口头承诺代替结果。
+2. **核对 `implement.md` 中的检查证据**：质量检查的完整输出应记录在 `implement.md`。确认对应命令实际通过；`check:req` 通过不能代替 typecheck、lint、build 等质量检查。
 3. **保持上下文隔离 (One REQ at a time)**：处理 `REQ-001` 时，绝对不要让它去修改 `REQ-002` 的代码。强制它完成当前需求的 Commit 后，再开启下一个需求。
 4. **严格遵循技术栈**：Rudder Framework 的核心策略之一是防止 AI 引入重型库或自定义 CSS。发现违规应在 Review 阶段直接打回。
 5. **需求变更走协议，不要就地改**：直接让 AI"顺手加个功能"会绕过 AC，导致 Review 失去基准、归档证据失真。**已归档 (DONE) 的需求一律开新 REQ**。

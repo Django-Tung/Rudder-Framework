@@ -69,7 +69,7 @@ requirements/IMP-YYYYMMDD-NNN/
 约束**只作用于 Plan → Commit 窗口**。**导入阶段例外**：
 
 - 必须读取 `source/` 下的原件与 `imported.md`；
-- 必须读取 `requirements/MASTER-PRD.md`，才能判定某段内容是全局规则还是独立功能点。
+- 必须读取 `requirements/MASTER-PRD.md`，才能判定某段内容是全局规则还是候选用户任务 / 连贯流程。
 
 这两项读取是导入的必要条件，不是越界。
 

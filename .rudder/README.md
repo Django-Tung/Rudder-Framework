@@ -33,7 +33,7 @@ Rudder 的规则分四层，各自回答一个不同的问题，**不重叠**：
 │   └── normalization.md       ←   归一化产物约定
 ├── analysis/                  ← IMP 分析侧
 │   ├── analysis.md            ←   analysis.md 的粗拆分规格
-│   ├── decomposition.md       ←   全局规则 vs 独立功能点的判定
+│   ├── decomposition.md       ←   全局规则、用户任务与页面流程的拆分判定
 │   └── dependency.md          ←   依赖门禁、懒级联、STALE
 ├── requirement/               ← REQ 侧
 │   ├── structure.md           ←   7 文件结构与 README.md frontmatter schema

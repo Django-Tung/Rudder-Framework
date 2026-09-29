@@ -78,7 +78,7 @@ pending_maps:
 
 1. IMP 在 `analyzed` 状态**不得**自动产出 REQ 目录。
 2. `/rudder-import` **内部暂停**，展示拆分结果（REQ 清单、标题、依赖关系）并请人工确认（中文）。
-3. 人工确认后：该条目 `status` → `APPROVED`，为其中**每个** REQ 创建目录与 7 个产物文件，
+3. 人工确认后：该条目 `status` → `APPROVED`，为其中**每个** REQ 创建目录与 6 个文档（含 `layout.md` 模板），
    IMP 的 `metadata.yaml.status` → `approved`。
 4. **立即从 `pending_maps` 移除该条目**——REQ 此后由 `AUTO-INDEX` 承接，
    **不得在两处同时登记**。

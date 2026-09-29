@@ -19,7 +19,7 @@
 | 命令 | 作用 |
 |------|------|
 | `/rudder-import [文档路径]` | 路径 A：导入 .docx/.md/.txt → 分析拆分 → **暂停等人工批准** → 批量产出 REQ 目录 |
-| `/rudder-plan [需求描述]` | 路径 B：澄清需求 → 生成 `requirements/REQ-XXX-*/plan.md`（PRD + 技术契约） |
+| `/rudder-plan [需求描述]` | 路径 B：澄清需求 → 生成 `plan.md`（PRD + 技术契约）与 `layout.md`（布局图） |
 | `/rudder-implement [REQ-ID]` | 拆解 `tasks.md` 后按契约实施 Types → Mocks → Services → UI |
 | `/rudder-plan-confirm [REQ-ID]` | 处理 PRD 确认不清楚的情况并推进批准 |
 | `/rudder-adjust [REQ-ID] [修改内容]` | 实施完成后的修改；契约变更转交 `rudder-change` |
@@ -58,7 +58,7 @@
 - 严格遵循 `.rudder/workflow/` 下的四份规则文件，不得越级推进。
 - `plan.md` 的 `APPROVED` **只能由人工写入**，Agent 不得自行批准。
 - 进入 Plan 阶段前，`README.md` 中 `deps` 列出的每个 REQ 的 `plan.md` **必须已是 `APPROVED`**。
-- 每个需求的产物落在 `requirements/REQ-XXX-*/` 下，**5 个文件**——4 个阶段产物 + 承载顶层状态的 `README.md`，
+- 每个需求的产物落在 `requirements/REQ-XXX-*/` 下，**6 个文档**——4 个阶段产物 + 承载顶层状态的 `README.md` + Plan 配套的 `layout.md`，
   各自记录自己 frontmatter 里的 `status`。
 - 每次阶段动作后，**必须同步更新 `README.md` 的顶层 `status`**（派生值），再由 `npm run check:req` 断言一致。
 
@@ -76,7 +76,7 @@ src/
 └── main.tsx
 
 skills/                       技能的唯一手写权威源（rudder-<name>.md × 7）
-requirements/REQ-XXX-name/    {README,plan,tasks,implement,verify,review,commit}.md（7 个）
+requirements/REQ-XXX-name/    {README,plan,layout,tasks,implement,commit}.md（6 个）
 requirements/IMP-YYYYMMDD-NNN/ 文档导入管道（source/ + imported.md + metadata.yaml + analysis.md）
 requirements/MASTER-PRD.md    全局业务规则、术语表、需求索引 + 待批准拆分（pending_maps）
 requirements/_inbox/          临时暂存，仅保留 fixtures/（脚本扫描时跳过）

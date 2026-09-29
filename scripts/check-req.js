@@ -172,9 +172,18 @@ function dependentsClosure(edges, id) {
 function checkArtifacts(dir) {
   const errors = [];
   const planPath = join(dir, 'plan.md');
+  const layoutPath = join(dir, 'layout.md');
   const tasksPath = join(dir, 'tasks.md');
   const implPath = join(dir, 'implement.md');
   const readmePath = join(dir, 'README.md');
+
+  if (!existsSync(layoutPath)) errors.push('缺少 layout.md（Plan 配套布局图）');
+  else {
+    const layout = readFrontmatter(layoutPath);
+    if (layout && (layout.status !== undefined || layout.phase !== undefined)) {
+      errors.push('layout.md 不应设置 status / phase（Plan 配套文档，不属于状态机）');
+    }
+  }
 
   if (!existsSync(planPath)) {
     errors.push('缺少 plan.md');

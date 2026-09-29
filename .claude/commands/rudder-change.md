@@ -13,7 +13,7 @@ argument-hint: [REQ-ID] [Change Description]
 Handle scope creep by updating the PRD, invalidating downstream evidence, and freezing code until human re-approval.
 
 ## Execution Steps
-1. **Update Plan**: Update User Stories / AC in `plan.md`. Append or update `## 📝 Change Log` at the end of the file. Every entry **MUST** record all four elements: **日期 (date) / 内容 (content) / 原因 (reason) / 影响范围 (impact scope)**.
+1. **Update Plan**: Update User Stories / AC in `plan.md` and keep `layout.md` synchronized whenever the change affects page structure or UI behavior. Append or update `## 📝 Change Log` at the end of `plan.md`. Every entry **MUST** record all four elements: **日期 (date) / 内容 (content) / 原因 (reason) / 影响范围 (impact scope)**.
 2. **Cascade Invalidation** (contract changed, so all downstream evidence is void). Reset each file explicitly:
    - `plan.md` -> `DRAFT` (awaiting human re-approval)
    - `tasks.md` -> `DRAFT` (old task breakdown must be redone)

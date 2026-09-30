@@ -31,13 +31,14 @@ Rudder 同时维护**两层**状态，二者职责不同：
 
 | 阶段 | 产物（证据文件） | 负责命令 | 负责技能 |
 |------|-----------------|---------|---------|
-| 1. Plan | `plan.md` | `/rudder-plan` | `rudder-plan` |
+| 1. Plan | `plan.md`（状态产物）+ `layout.md`（配套布局图，无状态） | `/rudder-plan` | `rudder-plan` |
 | 2. Tasks | `tasks.md` | `/rudder-implement`（起始步骤） | `rudder-implement` |
 | 3. Implement | `implement.md` | `/rudder-implement` | `rudder-implement` |
 | 4. Commit | `commit.md` | `/rudder-commit` | `rudder-commit` |
 
-每个 REQ 目录完整含 **5 个**文件（上述 4 个产物 + 承载顶层状态的 `README.md`），
+每个 REQ 目录完整含 **6 个**文档（上述 4 个阶段产物 + 承载顶层状态的 `README.md` + Plan 配套 `layout.md`），
 结构见 [`../requirement/structure.md`](../requirement/structure.md)。
+`layout.md` 不属于状态机，不设置 `status` / `phase`；它随 Plan 一起创建、Review，并在相关需求变更时同步更新。
 
 > **Archive 不是阶段**，是 Commit 的**后置动作**（见 [`transitions.md`](transitions.md) §6）。
 > **Import 不是阶段**，是**终止式管道**（`imported → analyzed → approved → archived`），

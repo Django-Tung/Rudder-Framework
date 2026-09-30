@@ -1,6 +1,6 @@
 ---
 name: rudder-implement
-description: Execute implementation based on approved plan.md, planning component structure and writing contract-first code.
+description: Execute implementation based on the approved plan.md and layout.md, planning component structure and writing contract-first code.
 triggers:
   - 开始实施 REQ-
   - 写代码 REQ-
@@ -16,16 +16,17 @@ triggers:
 > This covers **Tasks** and **Implement** of the requirement lifecycle, strictly following `.rudder/workflow/lifecycle.md`.
 
 ## Goal
-Execute the implementation of an approved PRD by breaking it down into tasks, planning the component structure based on the Page Structure, and writing contract-first code.
+Execute the implementation of an approved PRD by breaking it down into tasks, following its Page Structure and `layout.md` diagram, and writing contract-first code.
 
 ## Parameter Extraction
 Extract the target REQ-ID from user input. If missing, **MUST ask in Chinese**.
 
 ## Execution Steps
 1. **Check Gate**: Confirm target `REQ-XXX/plan.md` status **MUST** be `APPROVED`, and every REQ in its `deps` **MUST** also have `plan.md` = `APPROVED`. Stop and error otherwise, listing each unmet precondition.
+  - Read the target REQ's `layout.md` alongside `plan.md`; it is the approved visual companion and must guide page composition.
 2. **Task Breakdown**: Create or update `tasks.md`. Decompose AC-N from `plan.md` into specific tasks, set status to `READY`. Sync `README.md` status to `PLANNED`.
 3. **Component Planning**:
-   - **STRICT ACTION**: Strictly map the [📐 Page Structure & Component Skeleton] from `plan.md` to the `src/` directory structure.
+  - **STRICT ACTION**: Strictly map the [📐 Page Structure & Component Skeleton] from `plan.md` and the visual regions in `layout.md` to the `src/` directory structure and page composition.
    - **FORBIDDEN** to invent new components outside the defined tree.
 4. **Contract-First Coding**: Code in strict order: `Types` -> `Mocks` (**every mock/service MUST simulate 300–800ms latency via `setTimeout`**) -> `Services` -> `UI` (React + Tailwind).
    - UI **MUST** implement Loading / Empty / Error states.

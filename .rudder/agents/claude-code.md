@@ -41,7 +41,7 @@ Claude Code 每次会话按以下顺序加载（前一份指向后一份）：
 ### 3.2 导入阶段的例外
 
 导入阶段**不受** §3.1 约束——它必须读取外部待导入文档与 `MASTER-PRD.md`
-才能判定全局规则与独立功能点。见 [`../import/sources.md`](../import/sources.md) §4。
+才能判定全局规则与候选用户任务 / 连贯流程。见 [`../import/sources.md`](../import/sources.md) §4。
 
 ### 3.3 技能的读取
 

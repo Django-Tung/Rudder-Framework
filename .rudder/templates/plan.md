@@ -33,24 +33,15 @@ created: YYYY-MM-DD
   - **When** [用户操作，如：点击登录]
   - **Then** [预期结果，如：按钮恢复可用，页面顶部弹出中文错误提示“服务器开小差了，请稍后再试”]
 
-  ## 📐 页面结构与组件骨架 (Page Structure)
+  ## 📐 页面结构与布局图 (Page Structure)
 
-  > 说明：定义页面的宏观布局与核心组件层级，作为 Implement 阶段 React 组件拆分与 Tailwind 布局的直接依据。
+  > 先定义本 REQ 的用户目标和完整页面流程，再列出覆盖页面及区域 / 组件层级；跨页任务不得只描述单个孤立页面。具体桌面端与移动端布局图见同目录 `layout.md`，两份文档必须一致。
 
-  ### 1. 整体布局 (Layout)
-    - **顶部导航 (Header)**: 包含 Logo、全局搜索框、用户头像下拉菜单。
-    - **左侧边栏 (Sidebar)**: 包含一级/二级菜单，支持折叠。
-    - **主内容区 (Main Content)**: 占据剩余空间，内部采用卡片式布局。
-
-  ### 2. 核心组件树 (Component Tree)
-  - `<DashboardPage>`
-    - `<StatsOverview />` (展示 4 个核心指标卡片，Grid 布局)
-    - `<RecentActivityTable />` (展示最近操作记录，包含分页器)
-    - `<QuickActionsPanel />` (右侧悬浮或底部的快捷操作按钮组)
-
-  ### 3. 关键交互占位 (Interaction Slots)
-    - 在 `<StatsOverview />` 的每个卡片右上角，预留 `<TrendIndicator />` 组件位置（用于显示环比上升/下降箭头）。
-    - 在 `<RecentActivityTable />` 的表头，预留 `<ColumnFilter />` 组件位置。
+  - **用户目标与主流程**：[入口 → 页面 / 步骤 → 完成结果；未确认部分列为问题]
+  - **页面/路由**：[完成本 REQ 目标所需的页面及路由]
+  - **页面关系与共享框架**：[已确认的跳转、返回关系及跨页共用区域]
+  - **区域与组件层级**：[按实际需求列出，不得使用未经确认的示例组件]
+  - **布局图**：[layout.md](layout.md)
 
 ## 4. UI/UX 与状态规范 (UI/UX & State Specifications)
 > 🚨 **Rudder Framework 强制约束**：AI 必须处理以下所有 UI 状态，且所有面向用户的文案**必须为简体中文**。

@@ -3,14 +3,15 @@
 > 本文件回答「**一个 REQ 目录里有哪些文件、`README.md` 的 frontmatter 各字段是什么类型**」。
 > `status` 的**取值与推导**在 [`../workflow/states.md`](../workflow/states.md) 定义，本文件**只引用不复述**。
 
-## 1. 目录结构：5 个文件
+## 1. 目录结构：6 个文档
 
-每个需求**必须**拥有独立目录 `requirements/REQ-XXX-<kebab-name>/`，内含 **5 个**产物文件：
+每个需求**必须**拥有独立目录 `requirements/REQ-XXX-<kebab-name>/`，内含 **6 个**文档：
 
 ```text
 requirements/REQ-XXX-<kebab-name>/
 ├── README.md        ← REQ 级元数据：顶层状态与依赖（本文件 §2）
-├── plan.md          ← 阶段 1. Plan
+├── plan.md          ← 阶段 1. Plan（唯一承载阶段状态的文件）
+├── layout.md        ← Plan 配套页面布局图（无 status / phase）
 ├── tasks.md         ← 阶段 2. Tasks
 ├── implement.md    ← 阶段 3. Implement（含机器检查证据）
 └── commit.md       ← 阶段 4. Commit
@@ -87,5 +88,5 @@ stale_since: ""
 ## 5. 归档后的结构
 
 归档时整个目录被 `git mv` 到 `requirements/archive/<YYYY-MM>-REQ-XXX-<kebab-name>/`，
-**内部结构不变**，仍是 5 个文件。归档即封存，**不得就地修改**
+**内部结构不变**，仍是 6 个文档。归档即封存，**不得就地修改**
 （见 [`../workflow/transitions.md`](../workflow/transitions.md) §6）。

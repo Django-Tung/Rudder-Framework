@@ -49,9 +49,10 @@ project/
 │
 ├── requirements/             # 【事实与证据】具体需求的工作区
 │   ├── MASTER-PRD.md         # 全局业务规则、术语表、需求索引 + 待批准拆分（pending_maps）
-│   ├── REQ-001-xxx/          # 单个需求的完整生命周期档案（5 个文件）
+│   ├── REQ-001-xxx/          # 单个需求的完整生命周期档案（6 个文档）
 │   │   ├── README.md         #   REQ 级元数据：顶层状态、依赖、STALE
 │   │   ├── plan.md
+│   │   ├── layout.md         #   Plan 配套页面布局图
 │   │   ├── tasks.md
 │   │   ├── implement.md
 │   │   └── commit.md
@@ -91,10 +92,10 @@ project/
 
 | 你的情况 | 使用入口 | 入口结束后做什么 |
 |---|---|---|
-| 已有一份完整需求文档 | `/rudder-import` | 人工批准功能点拆分后，对每个 REQ 执行 `/rudder-plan` |
+| 已有一份完整需求文档 | `/rudder-import` | 人工批准用户任务 / 页面流程拆分后，对每个 REQ 执行 `/rudder-plan` |
 | 只有一个新想法或单个功能 | `/rudder-plan` | 直接进入详细 PRD 设计 |
 
-路径 A 的 Import 只回答“这份文档大致包含哪些功能点”，不回答“页面怎么做、AC 怎么写、接口和数据模型是什么”。这些问题统一在 Plan 阶段解决。
+路径 A 的 Import 只回答“这份文档大致包含哪些可独立完成的用户任务 / 页面流程，以及它们覆盖哪些页面线索”，不回答“页面具体怎么布局、AC 怎么写、接口和数据模型是什么”。这些问题统一在 Plan 阶段解决。
 
 | | **路径 A：批量（文档驱动）** | **路径 B：增量（人驱动）** |
 | :--- | :--- | :--- |
@@ -116,15 +117,16 @@ imported ──[粗读+拆分]──► analyzed ──[人工确认]──► a
 
 1. **`imported`**：运行 `node scripts/import-docx.js <文档>` 归一化；
    创建 `requirements/IMP-YYYYMMDD-NNN/`，原件原样复制进 `source/`。
-2. **`analyzed`**：AI 只做粗略读取和功能点拆分，产出轻量 `analysis.md`，
+2. **`analyzed`**：AI 只做粗略读取，并按完整用户任务 / 连贯流程归组候选 REQ，产出轻量 `analysis.md`，
    并把候选拆分结论写入 `MASTER-PRD.md` 的 `pending_maps`（`status: DRAFT`）。
    - **全局规则 / 术语**只记录文档明确写出的候选项；
-   - **候选独立功能点**拆成 `pending_maps` 中的 REQ 条目；
-   - 不在 Import 阶段编写 AC、页面结构、UI 三态、数据模型或技术契约；
+   - 一个候选 REQ 表达一个可独立完成和验收的用户目标，可包含多个相关页面与子功能；页面是分组线索，不机械地一页一个 REQ 或一个操作一个 REQ；
+   - 在 `analysis.md` 记录页面 / 流程线索和原文位置，帮助人工检查拆分是否连贯；
+   - 不在 Import 阶段编写 AC、详细页面结构、UI 三态、数据模型或技术契约；
    - 模糊内容标记为待 Plan 确认，不擅自补全。
 3. **⏸ 人工确认**：`/rudder-import` **内部暂停**，展示拆分结果（REQ 清单、标题、依赖关系），
    请人工用中文确认。**批准前不会创建任何 REQ 目录。**
-4. **`approved`**：人工确认后，该条目置 `APPROVED`，为其中每个 REQ 创建目录与 7 个产物文件，
+4. **`approved`**：人工确认后，该条目置 `APPROVED`，为其中每个 REQ 创建目录与 6 个文档（含 `layout.md` 模板），
    然后**立即从 `pending_maps` 移除**该条目——REQ 此后由 `AUTO-INDEX` 承接，不在两处登记。
    接着对每个 REQ 运行 `/rudder-plan REQ-XXX`，完成详细 PRD 和技术契约。
 
@@ -146,7 +148,7 @@ imported ──[粗读+拆分]──► analyzed ──[人工确认]──► a
 
 首次执行 `/rudder-plan` 同样必须先确保 `requirements/MASTER-PRD.md` 存在，并由用户确认项目 UI 主风格。业务范围、边界、依赖和 UI 行为存在不明确时，必须先提问并等待回答，不能猜测后直接生成正式 `plan.md`。
 
-直接创建 `requirements/REQ-XXX-<kebab-name>/` 与 7 个产物文件，`deps` 由**人工确认**，
+直接创建 `requirements/REQ-XXX-<kebab-name>/` 与 6 个文档，`deps` 由**人工确认**，
 不经过 `pending_maps`。
 
 路径 B 的实际操作顺序：
@@ -194,11 +196,11 @@ PLANNED ──► IMPLEMENTING ──► IMPLEMENTED ──► COMMITTED
 2. **用户操作**：输入初步需求（例如："做一个用户登录页，包含邮箱密码和记住我"）。
 3. **AI 响应**：提出 1-3 个关键澄清问题（如边界情况、交互细节）。
 4. **用户操作**：回答澄清问题。
-5. **AI 响应**：按 `.rudder/templates/plan.md` 创建 `plan.md`，填入业务背景与**非目标 (Non-Goals)**、用户故事与场景、BDD 验收标准、UI/UX 三态规范、技术契约与数据模型，状态设为 `DRAFT`；同步 `README.md` 顶层状态为 `PLANNED`。
+5. **AI 响应**：按 `.rudder/templates/plan.md` 创建 `plan.md`，填入业务背景与**非目标 (Non-Goals)**、用户故事与场景、BDD 验收标准、UI/UX 三态规范、技术契约与数据模型，状态设为 `DRAFT`；同时按 `.rudder/templates/layout.md` 创建独立 `layout.md`，给出桌面端和移动端布局图；同步 `README.md` 顶层状态为 `PLANNED`。
    - ⚠️ 验收标准必须以 `AC-1` / `AC-2` 形式编号，且 `tasks.md` 拆解时逐条引用——
      `npm run check:req` 的 **I1（拆解完备）** 依赖此格式，编号不规范会让该校验形同虚设。
    - **非目标**是防范围蔓延的硬边界，Implement 完成检查会逐条核对。
-6. **门控 (Gate)**：Agent 将 `plan.md` 保持为 `DRAFT` 并展示核心内容。用户 Review 后，执行 `/rudder-plan-confirm REQ-XXX`（Hermes 用户调用相应技能），再明确回复："**PRD 批准，状态改为 APPROVED**"。命令调用本身不代表批准；有未确认事项时先澄清，不得推进 Implement。
+6. **门控 (Gate)**：Agent 将 `plan.md` 保持为 `DRAFT`，展示核心内容和 `layout.md`。明确提示用户 Review 两份文档后执行 `/rudder-plan-confirm REQ-XXX`（Hermes 用户调用 `rudder-plan-confirm`），再明确回复："**PRD 批准，状态改为 APPROVED**"。命令调用本身不代表批准；有未确认事项时先澄清，不得推进 Implement。
 
 ### 阶段 2：Implement (代码实施)
 

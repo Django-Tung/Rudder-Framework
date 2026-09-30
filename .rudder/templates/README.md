@@ -30,6 +30,7 @@ stale_since: ""
 | 文件 | 状态 | 说明 |
 |---|---|---|
 | [`plan.md`](plan.md) | `DRAFT` | 需求规划（PRD + 技术契约） |
+| [`layout.md`](layout.md) | — | Plan 配套页面布局图（无独立状态） |
 | [`tasks.md`](tasks.md) | `DRAFT` | 任务清单 |
 | [`implement.md`](implement.md) | `PENDING` | 代码实施与机器检查记录 |
 | [`commit.md`](commit.md) | `PENDING` | 提交与归档记录 |

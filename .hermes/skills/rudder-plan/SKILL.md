@@ -28,7 +28,10 @@ If ambiguous, **MUST ask the user in Chinese** to clarify.
 ## Execution Steps
 1. **Initialize Main Record and Confirm UI Style**:
   - Ensure `requirements/MASTER-PRD.md` exists. If absent, create it with the sections for UI primary style, global business rules, terminology, pending maps, and the `AUTO-INDEX` block.
-  - Show the current UI primary style. If it is `UNCONFIRMED`, ask the human to choose or describe one (for example: data-dense workbench, lightweight content-oriented, brand-led, or custom). If it is already confirmed, ask whether to reuse it or adjust it for this project. Record the human-confirmed style in `MASTER-PRD.md` before writing `plan.md`.
+  - The UI primary style is a **preset package**, never a free-text description. Valid values: `P1` (light console), `P2` (dark data console), `P3` (warm content), `BRAND` (derived from the customer's brand color). See `.rudder/design/visual.md` §4 and the diagrams in `docs/styles/`.
+  - If no preset is recorded yet, show the user the three preset diagrams and ask **in Chinese**: "① Pick one of P1 / P2 / P3? ② Or just say 'you decide'." If the user says "you decide" (or otherwise does not choose), adopt the default `P1` and record `来源：用户未指定，采用默认预设`. **Do NOT block the flow waiting for a style answer.**
+  - If a preset is already recorded, show it and ask whether to keep it or switch.
+  - `BRAND` requires the customer brand color; derive only `--color-brand-*` and inherit every other token from `P1` (see `.rudder/design/visual.md` §4).
   - Ask every material clarification question about business rules, scope, actors, edge cases, dependencies, and UI behavior in Chinese. **Do not guess or fill gaps. Do not create or complete the formal PRD until the human answers.** Record confirmed cross-REQ rules and terminology in `MASTER-PRD.md`.
 2. **Context Loading**:
   - If user provides `REQ-XXX`: Read the existing skeleton at `requirements/REQ-XXX-xxx/plan.md` and `layout.md`; if `layout.md` is missing, create it from `.rudder/templates/layout.md`. Also read the matching rough analysis and `pending_maps` entry in `requirements/MASTER-PRD.md`, using the task goal, covered pages, and flow clues to preserve the approved grouping. **FORBIDDEN to re-read the lengthy raw imported document** (`requirements/IMP-*/imported.md`).
@@ -45,7 +48,7 @@ If ambiguous, **MUST ask the user in Chinese** to clarify.
     - 📐 **Page Structure & Component Skeleton**: State the REQ's user goal, main page flow, all pages / routes needed to complete it, and the component hierarchy in `plan.md`; link to `layout.md` for the complete diagram. Keep dependent steps together when splitting them would leave a disconnected page or incomplete flow.
     - **Layout Diagram (`layout.md`)**: Complete the separate document from its template. Show the confirmed page sequence and shared application frame, then draw desktop and mobile ASCII wireframes for every key page in the task. Add component mapping, page transitions, and responsive behavior. No CSS is needed. Use only confirmed requirements; mark unresolved layout decisions as questions instead of guessing. For a single-page task, one set of wireframes is sufficient.
      - **UI/UX Tri-state Specs** (Loading / Empty / Error)
-    - **Primary UI Style**: The confirmed project style from `MASTER-PRD.md`, plus any REQ-specific exception and its reason.
+    - **Primary UI Style**: The preset id recorded in `MASTER-PRD.md` (`P1` / `P2` / `P3` / `BRAND`), plus any REQ-specific exception and its reason. State the preset **id**, not a prose description.
      - **Tech Contract & Data Model** (Zustand Store, Mock Schema)
 6. **Gate**:
    - Set `plan.md` `status` to `DRAFT`, and sync `README.md` `status` to `PLANNED` (derived value, see `.rudder/workflow/states.md`).
@@ -58,4 +61,5 @@ If ambiguous, **MUST ask the user in Chinese** to clarify.
   - *Required Approval Prompt*: "请先 Review `plan.md` 和 `layout.md`。确认无误后，下一步请执行 `/rudder-plan-confirm REQ-XXX`（Hermes 用户请调用 `rudder-plan-confirm`）确认 PRD，并明确回复：**PRD 批准，状态改为 APPROVED**。"
 - **Layout Document**: `layout.md` **MUST** be written in Chinese except for technical terms and component names; it is a Plan companion document and **MUST NOT** carry `status` or `phase` fields.
 - **Business Content**: The entire content of `plan.md` (Background, Stories, ACs, Page Structure) **MUST be written in Chinese**. Technical terms, component names, and YAML keys can remain in English.
-- **UI Style Confirmation**: The primary UI style must be confirmed by the human and recorded in `MASTER-PRD.md`; it must not be inferred or silently selected by the Agent.
+- **UI Style Confirmation**: The primary UI style is a preset package chosen by the human from `docs/styles/` and recorded in `MASTER-PRD.md`. The Agent **MUST NOT** invent a style name or describe one in prose. However, when the human says "you decide", adopting the default `P1` and recording `来源：用户未指定，采用默认预设` is **required**, not optional — the flow must never stall on a style question.
+- **Human-facing Status**: whenever a status changes, also say it in plain Chinese using the mapping in `.rudder/workflow/states.md` §4 (e.g. "📝 需求还在起草，你可以随便改").

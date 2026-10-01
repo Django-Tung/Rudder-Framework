@@ -29,7 +29,10 @@ Extract the target REQ-ID from user input. If missing, **MUST ask in Chinese**.
   - **STRICT ACTION**: Strictly map the [📐 Page Structure & Component Skeleton] from `plan.md` and the visual regions in `layout.md` to the `src/` directory structure and page composition.
    - **FORBIDDEN** to invent new components outside the defined tree.
 4. **Contract-First Coding**: Code in strict order: `Types` -> `Mocks` (**every mock/service MUST simulate 300–800ms latency via `setTimeout`**) -> `Services` -> `UI` (React + Tailwind).
-   - UI **MUST** implement Loading / Empty / Error states.
+   - UI **MUST** implement Loading / Empty / Error states — use `Skeleton` / `EmptyState` / `ErrorState` from `@/components`, never hand-rolled spinners or bare text.
+   - **Visual constraints** (`.rudder/constitution.md` §2.1): every color **MUST** come from a design token defined in `src/index.css`'s `@theme`. **Hardcoding a hex color is forbidden** — `npm run lint` will fail. Prefer the semantic aliases and presets in `src/design/tokens.ts` over re-assembling class strings in pages.
+   - **Component reuse** (`.rudder/design/visual.md` §6.2): interactive elements of the same kind **MUST** reuse `@/components`. If a genuinely new component is unavoidable, record in `implement.md` why the existing ones don't fit; if it turns out to be generally useful, it **MUST** be moved down into `@/components`.
+   - **Local assets only** (`.rudder/design/assets.md`): **no remote image/font/media URLs** — the prototype must be demoable offline. Use `PlaceholderImage` for missing imagery; user-provided files live in `public/brand/` and `public/assets/`.
    - Check off `tasks.md` in real-time, and keep `README.md` `status` in sync (derived value, see `.rudder/workflow/states.md`).
 5. **Quality Checks**: After implementation, run `npm run typecheck`, `npm run lint`, `npm run build`, `npm run check:skills`, and `npm run check:req` in order. Any failure must be fixed and retried, with at most 3 rounds.
 6. **Finalize**: Set `tasks.md` status to `DONE`. Record the implementation summary, file list, and complete machine-check output in `implement.md`; set status to `COMPLETED`, and sync `README.md` status to `IMPLEMENTED`.
@@ -38,3 +41,4 @@ Extract the target REQ-ID from user input. If missing, **MUST ask in Chinese**.
 ## 🗣️ Interaction & Output Constraints (STRICT)
 - **UI Copy**: All user-facing text in the UI components **MUST be in Chinese**.
 - **User Interaction**: When reporting completion or asking for the next step, **MUST use Chinese**.
+- **Human-facing Status**: whenever a status changes, also say it in plain Chinese using the mapping in `.rudder/workflow/states.md` §4 (e.g. "🧪 代码写完了，打开看看满不满意").

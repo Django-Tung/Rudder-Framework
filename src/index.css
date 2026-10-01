@@ -1,1 +1,63 @@
 @import 'tailwindcss';
+
+/* ============================================================================
+ * 设计令牌 — 当前生效预设：P1 · 清爽后台
+ *
+ * 完整规范见 .rudder/design/visual.md §4。
+ * 本文件是本项目【唯一的色值来源】：src/ 下禁止出现任何十六进制色值。
+ * 换预设 = 替换下方整个 @theme 块；业务代码使用语义令牌名，无需改动。
+ * ========================================================================== */
+@theme {
+  /* ---- 色板 ---- */
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+
+  --color-surface-page: #f8fafc;
+  --color-surface-card: #ffffff;
+
+  --color-border-base: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+  --color-text-inverse: #ffffff;
+
+  --color-danger-600: #dc2626;
+  --color-success-600: #16a34a;
+  --color-warning-600: #d97706;
+
+  /* ---- 字阶（语义名，换预设时不改代码）---- */
+  --text-title: 1.5rem;
+  --text-title--line-height: 2rem;
+  --text-title--font-weight: 700;
+
+  --text-subtitle: 1.125rem;
+  --text-subtitle--line-height: 1.75rem;
+  --text-subtitle--font-weight: 600;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --text-body--font-weight: 400;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-caption--font-weight: 400;
+
+  /* ---- 圆角 ---- */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  /* ---- 阴影 ---- */
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.06);
+  --shadow-md: 0 4px 12px rgb(15 23 42 / 0.08);
+
+  /* ---- 间距节奏 ---- */
+  --spacing-page: 1.5rem;
+  --spacing-card: 1.5rem;
+  --spacing-section: 2rem;
+}

@@ -37,7 +37,10 @@ Rudder 的规则分四层，各自回答一个不同的问题，**不重叠**：
 │   └── dependency.md          ←   依赖门禁、懒级联、STALE
 ├── requirement/               ← REQ 侧
 │   ├── structure.md           ←   7 文件结构与 README.md frontmatter schema
-│   └── acceptance.md          ←   AC 编号规范
+│   └── acceptance.md          ←   AC 编号与可判定性规范
+├── design/                    ← 视觉与资源（界面长什么样）
+│   ├── visual.md              ←   设计令牌、预设风格包、通用组件层
+│   └── assets.md              ←   本地资源规范（零外网依赖）
 ├── implementation/            ← 三阶段产物规格
 ├── agents/                    ← 各 runtime 的读取约定
 │   └── claude-code.md
@@ -53,8 +56,11 @@ Rudder 的规则分四层，各自回答一个不同的问题，**不重叠**：
 | 现在能不能进入下一阶段 | [`workflow/gates.md`](workflow/gates.md) |
 | 实施检查失败 / 需求变更时怎么办 | [`workflow/transitions.md`](workflow/transitions.md) |
 | 代码与技术栈的硬性约束 | [`constitution.md`](constitution.md) |
+| 界面该长什么样、颜色从哪来、组件能不能复用 | [`design/visual.md`](design/visual.md) |
+| 图片 / 图标 / 字体从哪来 | [`design/assets.md`](design/assets.md) |
 | 把一份外部文档导入成需求 | [`import/sources.md`](import/sources.md) → [`analysis/decomposition.md`](analysis/decomposition.md) |
 | REQ 目录里该有哪些文件 | [`requirement/structure.md`](requirement/structure.md) |
+| 验收标准怎么写才算合格 | [`requirement/acceptance.md`](requirement/acceptance.md) |
 | 换个 runtime 执行会有什么区别 | [`agents/claude-code.md`](agents/claude-code.md) |
 
 ## 4. `workflow/` 四个文件的分工

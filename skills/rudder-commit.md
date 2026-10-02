@@ -36,7 +36,13 @@ Extract the target REQ-ID. If missing, **MUST ask in Chinese**.
    - Backfill `commit.md` archive metadata (`archived: true`, `archived_at`, `archive_path`).
    - **Archived means sealed**: further changes to a committed REQ **MUST** open a new REQ, never edit the archived directory in place.
    - If `git mv` fails, stop and report; never discard the requirement directory.
+5. **Demo Readiness Reminder — NON-BLOCKING**: After archiving, remind the user in Chinese that the prototype is ready to demo, and point them at two things:
+   - `docs/demo-checklist.md` — the pre-demo checklist (project name in the browser tab, mock data credibility, **offline test**, no broken images). **Remind but do NOT block**: never refuse to complete the commit because of this.
+   - The `演示动线` section in `implement.md` — the AI-generated demo path (opening page, ordered steps, closing screen, fallback), so the user does not have to improvise on the spot.
+   - Do **NOT** write the "these are simulated" talking points for the user; per decision D10 the user delivers those themselves.
 
 ## 🗣️ Interaction & Output Constraints (STRICT)
 - **Commit Message**: The Git commit message **MUST be in Chinese** (e.g., `feat(REQ-001): 实现用户登录页面及状态管理`).
 - **User Interaction**: The final completion and archive report to the user **MUST be in Chinese**.
+- **Human-facing Status**: report the final state in plain Chinese using the mapping in `.rudder/workflow/states.md` §4 (e.g. "📦 已提交存档").
+- **AC Sign-off**: if the REQ's `implement.md` AC rows are still unticked, mention that the user can tick them after reviewing the prototype in a browser. Do **NOT** tick them on their behalf.

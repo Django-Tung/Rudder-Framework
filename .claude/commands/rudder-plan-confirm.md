@@ -18,10 +18,13 @@ argument-hint: [REQ-ID]
 1. 读取目标 REQ 的 `README.md`、`plan.md`、`layout.md`、`MASTER-PRD.md` 及依赖方的 `plan.md`。
 2. 向用户简要汇总 `plan.md` 的范围、验收标准和技术契约，并展示 `layout.md` 的页面布局图，便于 Review。
 3. 检查 `layout.md` 是否存在且与 `plan.md` 中确认的用户目标、页面流程和页面结构一致；多页任务应覆盖完成目标所需的关键页面、页面关系及共享框架，不能留下孤立页面或断开的主流程。单页任务按单页检查。同时检查所有重大澄清问题、UI 主风格、范围、依赖和边界是否都已由用户确认。
-4. 如果仍有未确认项，逐项列出并向用户提问；保持 `plan.md = DRAFT`、`README.md = PLANNED`，不得批准。若回答会改变计划或页面布局，先回到 `/rudder-plan` 同步更新 `plan.md` 与 `layout.md`，再重新确认。
-5. 如果所有事项已明确，但用户尚未明确批准，提示用户回复：**PRD 批准，状态改为 APPROVED**。保持 `plan.md = DRAFT` 并等待用户确认；不得把命令调用或沉默视为批准。
-6. 只有收到用户明确批准后，才将 `plan.md` 设置为 `APPROVED`，同步 `README.md = PLANNED`，运行 `npm run check:req`。检查失败时报告错误并停止，不得提示开始实施。
-7. 检查通过后提示用户执行 `/rudder-implement REQ-XXX`。
+4. **AC 可判定性检查（MANDATORY）**：逐条检查 `plan.md` 中每条 AC 的 `Then` 是否包含**界面上可观察的具体行为**（出现的文字、元素、状态、数值）。凡只写主观判断（「美观易用」「友好提示」「加载要快」）的 AC，**退回重写**，不得批准。理由与范例见 `.rudder/requirement/acceptance.md` §4。
+   > 这项检查对用户有实际价值：写不出可观察行为的 AC，说明业务需求本身还没想清楚，正是应当继续澄清的信号。
+5. **响应式口径检查**：`plan.md` §4 的「响应式要求」必须以 `需要` 或 `不需要` 开头，且与 `layout.md` 的「响应式行为」口径一致（`npm run check:req` 的 **I4** 会断言）。若用户未表态，用中文询问——**响应式是可选的，明确答「不需要」是完全合法且常见的答案**，不得默认要求双端。
+6. 如果仍有未确认项，逐项列出并向用户提问；保持 `plan.md = DRAFT`、`README.md = PLANNED`，不得批准。若回答会改变计划或页面布局，先回到 `/rudder-plan` 同步更新 `plan.md` 与 `layout.md`，再重新确认。
+7. 如果所有事项已明确，但用户尚未明确批准，提示用户回复：**PRD 批准，状态改为 APPROVED**。保持 `plan.md = DRAFT` 并等待用户确认；不得把命令调用或沉默视为批准。
+8. 只有收到用户明确批准后，才将 `plan.md` 设置为 `APPROVED`，同步 `README.md = PLANNED`，运行 `npm run check:req`。检查失败时报告错误并停止，不得提示开始实施。
+9. 检查通过后提示用户执行 `/rudder-implement REQ-XXX`。
 
 ## 约束
 
@@ -29,3 +32,5 @@ argument-hint: [REQ-ID]
 - 不得自行推断或补全业务规则。
 - `plan.md = APPROVED` 只能由用户明确批准触发。
 - 所有交互与报告必须使用简体中文。
+- 状态变化时附一句人话说明（映射见 `.rudder/workflow/states.md` §4）。
+- **不得**为了「让流程走通」而替用户决定 AC 内容、范围或响应式口径；拿不准就提问。

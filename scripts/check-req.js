@@ -9,6 +9,10 @@
  *      悬挂依赖、自依赖、环、README 与索引的漂移。
  *   D. `STALE` 一致性（见 .rudder/analysis/dependency.md §6）：
  *      标记缺失 / `stale_reason` 指向错误 / 已被裁决却未摘除。
+ *   E. AC 实现对账与响应式口径 —— I3（每条 AC 在 implement.md 的核对表中有实现位置）、
+ *      I4（plan.md 与 layout.md 的响应式口径一致，且不含空话）。
+ *      I1/I2 查的是**文档之间的引用完整性**，不是代码与需求的一致性；
+ *      I3/I4 补上这一环（见 .rudder/requirement/acceptance.md §4）。
  *
  * `MASTER-PRD.md`（`type: master-prd`）是例外文档，不参与阶段校验，
  * 且 MUST NOT 带 `status` / `phase` 字段。
@@ -269,7 +273,7 @@ function checkArtifacts(dir) {
     errors.push(`stale 取值非法: ${readme.stale}（应为 true 或 false）`);
   }
 
-  return { errors, artifacts, readme };
+  return { errors: [...errors, ...checkAcTrace(dir, acIds), ...checkResponsive(dir)], artifacts, readme };
 }
 
 /** C + D：全仓依赖图与 STALE 一致性。 */
@@ -338,6 +342,124 @@ function checkGraph(entries) {
     }
   }
 
+  return errors;
+}
+
+/* ------------------------------------------------------------------------ *
+ * E. AC 实现对账（I3）与响应式口径（I4）
+ * ------------------------------------------------------------------------ */
+
+/** implement.md 中「AC 实现核对表」的锚点标题。 */
+const IMPL_TABLE_HEADING = 'AC 实现核对表';
+
+/**
+ * 解析 implement.md 的「AC 实现核对表」，返回 `Map<AC 编号, 实现位置>`。
+ * 只认表格数据行（以 `|` 开头），跳过表头与分隔行。
+ */
+function readAcTraceTable(implText) {
+  const rows = new Map();
+  const lines = implText.split('\n');
+  let inSection = false;
+  for (const line of lines) {
+    const h = line.match(/^(#+)\s+(.*)$/);
+    if (h) {
+      inSection = h[2].includes(IMPL_TABLE_HEADING);
+      continue;
+    }
+    if (!inSection || !line.trim().startsWith('|')) continue;
+    const cells = line.split('|').slice(1, -1).map((c) => c.trim());
+    const ac = cells[0]?.match(/AC-\d+/)?.[0];
+    if (!ac) continue;
+    rows.set(ac, cells[1] ?? '');
+  }
+  return rows;
+}
+
+/**
+ * I3：每条 AC 都必须在 implement.md 的核对表中出现，且实现位置非空。
+ * 「填不出来 = 没有实现」——这是本轮唯一能把「勾完任务即完成」变成
+ * 「必须落到具体代码行」的确定性断言。
+ */
+function checkAcTrace(dir, acIds) {
+  const errors = [];
+  const implPath = join(dir, 'implement.md');
+  if (!existsSync(implPath)) return errors;
+
+  const implText = readFileSync(implPath, 'utf8');
+  const implStatus = readStatus(implPath);
+  const hasTable = implText.includes(IMPL_TABLE_HEADING);
+
+  // 核对表是 implement 的对账凭据，COMPLETED 时不得缺席
+  if (!hasTable && implStatus === 'COMPLETED') {
+    errors.push(`I3: implement=COMPLETED 但缺少「${IMPL_TABLE_HEADING}」（见 .rudder/templates/implement.md）`);
+    return errors;
+  }
+  if (!hasTable || acIds.length === 0) return errors;
+
+  const rows = readAcTraceTable(implText);
+  for (const ac of acIds) {
+    if (!rows.has(ac)) {
+      errors.push(`I3: ${ac} 未出现在 implement.md 的「${IMPL_TABLE_HEADING}」中`);
+    } else if (!rows.get(ac)) {
+      errors.push(`I3: ${ac} 的实现位置为空（填不出来即代表未实现）`);
+    }
+  }
+  // 核对表里的编号必须来自 plan.md，防止为凑行数编造 AC
+  const known = new Set(acIds);
+  for (const ac of rows.keys()) {
+    if (!known.has(ac)) errors.push(`I3: 核对表中的 ${ac} 在 plan.md 中不存在`);
+  }
+  return errors;
+}
+
+/** 响应式口径的空话黑名单——写了等于没写。 */
+const VAGUE_RESPONSIVE = /自适应|响应式良好|响应式设计良好|支持多种屏幕|适配各种屏幕/;
+
+/**
+ * I4：plan.md 与 layout.md 对「本 REQ 是否需要响应式」的口径必须一致。
+ * 口径写法见模板：plan.md 的 `- **响应式要求**：` 必须以 `需要` / `不需要` 开头；
+ * layout.md 的 `- 响应式行为：` 在「不需要」时必须写 `本 REQ 无响应式要求`。
+ */
+function checkResponsive(dir) {
+  const errors = [];
+  const planPath = join(dir, 'plan.md');
+  const layoutPath = join(dir, 'layout.md');
+  if (!existsSync(planPath)) return errors;
+
+  const planText = readFileSync(planPath, 'utf8');
+  const planLine = planText.match(/^-\s*\*\*响应式要求\*\*[：:]\s*(.+)$/m);
+  if (!planLine) {
+    errors.push('I4: plan.md 缺少 `- **响应式要求**：` 条目（见 .rudder/templates/plan.md §4）');
+    return errors;
+  }
+  const planValue = planLine[1].trim();
+  let planNeeds;
+  if (planValue.startsWith('不需要')) planNeeds = false;
+  else if (planValue.startsWith('需要')) planNeeds = true;
+  else {
+    errors.push('I4: plan.md 的「响应式要求」口径不明确，必须以 `需要` 或 `不需要` 开头');
+    return errors;
+  }
+
+  if (!existsSync(layoutPath)) return errors;
+  const layoutText = readFileSync(layoutPath, 'utf8');
+  const layoutLine = layoutText.match(/^-\s*响应式行为[：:]\s*(.+)$/m);
+  if (!layoutLine) {
+    errors.push('I4: layout.md 缺少 `- 响应式行为：` 条目（见 .rudder/templates/layout.md）');
+    return errors;
+  }
+  const layoutValue = layoutLine[1].trim();
+  const layoutNeeds = !layoutValue.includes('本 REQ 无响应式要求');
+
+  if (planNeeds !== layoutNeeds) {
+    errors.push(
+      `I4: 响应式口径不一致——plan.md「${planValue}」vs layout.md「${layoutValue}」`,
+    );
+  }
+  // 需要响应式却只写了「自适应」这类空话，等于没写
+  if (planNeeds && VAGUE_RESPONSIVE.test(layoutValue)) {
+    errors.push(`I4: layout.md 的「响应式行为」含无信息量表述（${layoutValue}），须写明具体断点与变化`);
+  }
   return errors;
 }
 

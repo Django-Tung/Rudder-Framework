@@ -23,6 +23,8 @@ created: YYYY-MM-DD
 
 ## 3. 验收标准 (BDD Acceptance Criteria)
 > 必须使用 Given-When-Then 格式，这是 Implement 完成检查的唯一基准。
+> 🚨 **可判定性强制**：每条 `Then` 必须包含**界面上可观察的具体行为**（出现的文字、元素、状态、数值），
+> 不得只写主观判断。见 [`.rudder/requirement/acceptance.md`](../requirement/acceptance.md) §4。
 
 - **AC-1: [功能点名称]**
   - **Given** [前置条件，如：用户处于登录页且网络正常]
@@ -45,12 +47,19 @@ created: YYYY-MM-DD
 
 ## 4. UI/UX 与状态规范 (UI/UX & State Specifications)
 > 🚨 **Rudder Framework 强制约束**：AI 必须处理以下所有 UI 状态，且所有面向用户的文案**必须为简体中文**。
+> 三态一律复用 `@/components` 的 `Skeleton` / `EmptyState` / `ErrorState`，不得各页面自绘。
 
-- **Loading 状态**：[描述加载时的 UI 表现，如：骨架屏 / 按钮 Spin / 全局遮罩]
-- **Empty 状态**：[描述无数据时的 UI 表现及引导文案]
-- **Error 状态**：[描述请求失败或表单校验失败时的 UI 表现及中文提示文案]
+- **Loading 状态**：[描述加载时的 UI 表现，通常复用 `SkeletonRows`]
+- **Empty 状态**：[描述无数据时的 UI 表现及引导文案，复用 `EmptyState`]
+- **Error 状态**：[描述请求失败或表单校验失败时的 UI 表现及中文提示文案，复用 `ErrorState`]
 - **Success/Default 状态**：[描述正常渲染的 UI 布局]
-- **响应式要求**：[如：移动端优先，断点设置在 768px]
+- **响应式要求**：`需要` —— [写明具体断点与变化，如：桌面端侧栏在 <768px 时收进顶部汉堡菜单，表格转为卡片列表] ／ `不需要` —— 本 REQ 只需桌面端
+  > 🚨 **必须**以 `需要` 或 `不需要` 开头——`check:req` 的 **I4** 断言本条口径明确，
+  > 且与 `layout.md` 的「响应式行为」一致。禁止「自适应」「响应式良好」这类空话。
+
+- **视觉约束引用**：本 REQ 遵循 `MASTER-PRD.md` 的 UI 主风格预设（`P1`/`P2`/`P3`/`BRAND`）。
+  颜色一律取自 `src/index.css` 的 `@theme` 令牌，**禁止硬编码色值**；
+  同类交互元素一律复用 `@/components`。
 
 ## 5. 技术契约与数据模型 (Technical Contract & Data Models)
 > 🚨 **Rudder Framework 强制约束**：严格遵守技术栈 (React 19 + TS strict + Tailwind v4 + Zustand)。禁止引入未授权的第三方 UI 库。

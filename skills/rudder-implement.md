@@ -36,9 +36,16 @@ Extract the target REQ-ID from user input. If missing, **MUST ask in Chinese**.
    - **Component reuse** (`.rudder/design/visual.md` §6.2): interactive elements of the same kind **MUST** reuse `@/components`. If a genuinely new component is unavoidable, record in `implement.md` why the existing ones don't fit; if it turns out to be generally useful, it **MUST** be moved down into `@/components`.
    - **Local assets only** (`.rudder/design/assets.md`): **no remote image/font/media URLs** — the prototype must be demoable offline. Use `PlaceholderImage` for missing imagery; user-provided files live in `public/brand/` and `public/assets/`.
    - Check off `tasks.md` in real-time, and keep `README.md` `status` in sync (derived value, see `.rudder/workflow/states.md`).
-5. **Quality Checks**: After implementation, run `npm run typecheck`, `npm run lint`, `npm run build`, `npm run check:skills`, and `npm run check:req` in order. Any failure must be fixed and retried, with at most 3 rounds.
-6. **Finalize**: Set `tasks.md` status to `DONE`. Record the implementation summary, file list, and complete machine-check output in `implement.md`; set status to `COMPLETED`, and sync `README.md` status to `IMPLEMENTED`.
-7. **Failure Rule**: After 3 failed rounds, keep `implement.md` as `IN_PROGRESS`, record the failures, stop, and report to the human.
+5. **AC Traceability — MANDATORY**: Fill in the `AC 实现核对表` section of `implement.md` with **one row per AC in `plan.md`**:
+   - Column 2 (实现位置): the concrete `path:line` that implements the AC. **If you cannot point at a real location, the AC is not implemented** — do not write a placeholder.
+   - Column 3 (核对结论): leave as `☐` **unchecked**. The user ticks it after opening the prototype in a browser. Do **NOT** self-verify this column — that would defeat the purpose of the check.
+   - `npm run check:req` (**I3**) asserts the row count matches the AC count, the ids match, and no location is empty.
+   - See `.rudder/requirement/acceptance.md` §4 for why this matters: I1/I2 only prove the *documents* agree, not that the *page* satisfies the AC.
+6. **Demo Script**: Fill in the `演示动线` section of `implement.md` — opening page, 3–5 ordered steps with what to say, closing screen, and a fallback. You have the full page structure, so pick the most persuasive path rather than leaving it to the user.
+7. **Quality Checks**: After implementation, run `npm run typecheck`, `npm run lint`, `npm run build`, `npm run check:skills`, and `npm run check:req` in order. Any failure must be fixed and retried, with at most 3 rounds.
+8. **Finalize**: Set `tasks.md` status to `DONE`. Record the implementation summary, file list, and complete machine-check output in `implement.md`; set status to `COMPLETED`, and sync `README.md` status to `IMPLEMENTED`.
+9. **Handoff**: After completion, tell the user in Chinese that they can open `http://localhost:5173`, walk the 演示动线, and tick the AC rows in `implement.md` themselves. Do not tick them on their behalf.
+10. **Failure Rule**: After 3 failed rounds, keep `implement.md` as `IN_PROGRESS`, record the failures, stop, and report to the human.
 
 ## 🗣️ Interaction & Output Constraints (STRICT)
 - **UI Copy**: All user-facing text in the UI components **MUST be in Chinese**.

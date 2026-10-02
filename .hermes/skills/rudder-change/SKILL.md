@@ -36,4 +36,5 @@ Extract the target REQ-ID and the description of the change from user input. If 
 ## 🗣️ Interaction & Output Constraints (STRICT)
 - **Change Log**: The content of the `Change Log` in `plan.md` **MUST be written in Chinese**.
 - **User Interaction**: The report informing the user about the freeze and requesting re-approval **MUST be in Chinese**.
+- **Human-facing Status**: the cascading invalidation (`plan.md` → `DRAFT`, `tasks.md` → `DRAFT`, `implement.md` → `OUTDATED`) **MUST** be reported in plain Chinese using the mapping in `.rudder/workflow/states.md` §4 (e.g. "⚠️ 需求改过了，这份实现作废，要重新做"), together with the concrete next action the user must take.
   - *Required Prompt*: "需求变更已记录，下游证据已级联失效，代码已冻结。请 Review 新的 plan.md。确认无误后，请回复：**PRD 批准，状态改为 APPROVED** 以解冻代码。"

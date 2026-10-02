@@ -1,5 +1,7 @@
 # Rudder Framework 新手教程
 
+> 💡 **第一次用？先看 [快速开始](quickstart.md)**（一页纸决策树）。本教程适合需要完整细节时查阅。
+
 本教程带你完成一次从安装依赖到启动项目、选择需求入口和完成代码检查的完整流程。
 
 **快速跳转：**[准备环境](#1-准备环境) · [安装项目](#2-获取项目并安装依赖) · [启动开发服务器](#3-启动开发服务器) · [创建需求](#5-创建第一个需求) · [实施与提交](#6-实施和提交需求) · [修复 Bug / 变更需求](#7-修复-bug-或变更需求) · [命令速查](#9-命令速查) · [完成前检查](#10-完成前检查清单)
@@ -41,8 +43,8 @@ git --version
 如果项目还没有下载到本机：
 
 ```bash
-git clone <项目地址>
-cd ProtoSource
+git clone https://github.com/Django-Tung/Rudder-Framework.git
+cd Rudder-Framework
 ```
 
 进入项目目录后安装依赖：
@@ -117,7 +119,7 @@ REQ 目录创建后，必须对每个 REQ 单独执行 `/rudder-plan`：
 
 此时才补充用户故事、AC、页面结构、UI 三态、数据模型和技术契约。
 
-Plan 完成后先 Review 新计划，再对该 REQ 执行 `/rudder-plan-confirm REQ-001`，并明确批准。若使用 Hermes，请调用 `rudder-plan-confirm` 技能。命令调用本身不代表批准。
+Plan 完成后先 Review 新计划，再对该 REQ 执行 `/rudder-plan-confirm REQ-001`，并明确批准。**命令调用本身不代表批准。**
 
 ### 方式 B：直接描述需求
 
@@ -139,7 +141,7 @@ Agent 会先提出澄清问题，然后在 `requirements/REQ-XXX-<name>/` 下生
 PRD 批准，状态改为 APPROVED
 ```
 
-如果使用 Hermes，请调用 `rudder-plan-confirm` 技能并提供对应的 REQ-ID。确认命令会检查未解决的问题；命令调用本身不代表批准。只有收到明确批准且 `npm run check:req` 通过后，才能开始 `/rudder-implement`。
+如果使用 Hermes，请调用 `rudder-plan-confirm` 技能并提供对应的 REQ-ID。确认命令会检查未解决的问题；**命令调用本身不代表批准**。只有收到明确批准且 `npm run check:req` 通过后，才能开始 `/rudder-implement`。
 
 ## 6. 实施和提交需求
 
@@ -156,8 +158,8 @@ PRD 批准，状态改为 APPROVED
 | --- | --- |
 | Plan | 明确范围、用户场景和验收标准 |
 | Tasks | 将验收标准拆成可执行任务 |
-| Implement | 按 Types、Mocks、Services、UI 顺序实施 |
-| Implement | 运行类型检查、Lint、Build 和规则校验，并记录到 `implement.md` |
+| Implement（编码） | 按 Types、Mocks、Services、UI 顺序实施 |
+| Implement（校验） | 运行类型检查、Lint、Build 和规则校验，并记录到 `implement.md` |
 | Commit | 提交代码并归档需求证据 |
 
 不要在未批准 PRD 时直接修改 `src/`。如果需求范围发生变化，使用：
@@ -235,8 +237,8 @@ npm run check:skills
 | 检查 Node.js | `node --version` | 查看 Node.js 版本 |
 | 检查 npm | `npm --version` | 查看 npm 版本 |
 | 检查 Git | `git --version` | 查看 Git 版本 |
-| 克隆项目 | `git clone <项目地址>` | 仅在项目尚未下载时执行 |
-| 进入项目目录 | `cd <项目目录>` | 将占位符替换为克隆后生成的目录名 |
+| 克隆项目 | `git clone https://github.com/Django-Tung/Rudder-Framework.git` | 仅在项目尚未下载时执行 |
+| 进入项目目录 | `cd Rudder-Framework` | 若克隆时改了目录名，替换成实际目录名 |
 | 安装依赖 | `npm install` | 在项目根目录执行 |
 | 开发预览 | `npm run dev` | 启动开发服务器；按 `Ctrl+C` 停止 |
 | 预览生产构建 | `npm run build`，再执行 `npm run preview` | 先构建，再本地预览构建结果 |
@@ -303,3 +305,6 @@ npm run sync:master -- --check
 ```
 
 如果校验全部通过，再进入人工 Review 和 Commit 阶段。
+
+**演示给客户之前**，再走一遍 [演示检查清单](demo-checklist.md)：
+外链资源、浏览器控制台报错、演示动线、断网测试。

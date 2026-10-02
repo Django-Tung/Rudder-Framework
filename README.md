@@ -4,7 +4,7 @@
 
 Rudder Framework 是一个为 AI Agent（如 Claude Code, Hermes Agent）设计的结构化需求原型开发框架。它通过**严格的规则约束**、**标准化的文档模板**和**自动化的反馈闭环**，确保 AI 能够高质量、可追溯地交付纯前端 React 原型。
 
-第一次使用请先阅读[新手教程](docs/getting-started.md)，其中包含环境准备、依赖安装、开发服务器启动和第一个需求的完整示例。快捷跳转：[环境准备](docs/getting-started.md#1-准备环境) · [创建需求](docs/getting-started.md#5-创建第一个需求) · [实施与提交](docs/getting-started.md#6-实施和提交需求) · [修复 Bug 与变更需求](docs/getting-started.md#7-修复-bug-或变更需求) · [命令速查](docs/getting-started.md#9-命令速查)
+第一次使用请先读**[快速开始](docs/quickstart.md)**（一页纸决策树：我想做什么 / 我现在能做什么 / AI 停下来了要我回答什么 / 出错了怎么办）。需要更多细节时再看[新手教程](docs/getting-started.md)，其中包含环境准备、依赖安装、开发服务器启动和第一个需求的完整示例。快捷跳转：[环境准备](docs/getting-started.md#1-准备环境) · [创建需求](docs/getting-started.md#5-创建第一个需求) · [实施与提交](docs/getting-started.md#6-实施和提交需求) · [修复 Bug 与变更需求](docs/getting-started.md#7-修复-bug-或变更需求) · [命令速查](docs/getting-started.md#9-命令速查)
 
 ### 核心设计理念
 
@@ -38,11 +38,10 @@ project/
 │   │   └── transitions.md    #   异常流转：6 类
 │   ├── import/               # IMP 管道：输入 / 解析 / 归一化
 │   ├── analysis/             # 分析侧：analysis 规格 / 拆分判定 / 依赖与 STALE
-│   ├── requirement/          # REQ 侧：7 文件结构 / AC 编号规范
+│   ├── requirement/          # REQ 侧：7 文件结构 / AC 编号与可判定性规范
+│   ├── design/               # 视觉规范（令牌与预设风格包）/ 本地资源规范
 │   ├── implementation/       # 三阶段产物规格
-│   ├── verification/
-│   ├── review/
-│   ├── agents/               # 各 runtime 的读取约定与上下文边界
+│   ├── agents/               # 各 runtime 的读取约定与上下文边界（当前仅 Claude Code）
 │   └── templates/            # 需求文档模板（状态初值的来源）
 │
 ├── skills/                   # 【技能权威源】唯一手写处：rudder-<name>.md × 7
@@ -280,7 +279,7 @@ REQ-001 契约变更
 
 ## 5. 常用指令速查
 
-### 使用 Claude Code (终端)
+### 日常用法：Claude Code（推荐）
 
 通过 `.claude/commands/` 下的斜杠命令触发，需指定 REQ-ID。
 
@@ -294,9 +293,10 @@ REQ-001 契约变更
 | **Commit** | `/rudder-commit REQ-001` |
 | **Change** (异常分支) | `/rudder-change REQ-001 "增加忘记密码入口"` |
 
-### 使用 Hermes Agent (终端/IM)
+<details>
+<summary><b>进阶：使用 Hermes Agent（终端 / IM）</b></summary>
 
-通过自然语言意图触发 `.hermes/skills/` 下的技能。
+如果你的 Agent 运行时是 Hermes，改用**自然语言意图**触发 `.hermes/skills/` 下的同名技能：
 
 | 阶段 | 用户输入示例 |
 | :--- | :--- |
@@ -307,6 +307,8 @@ REQ-001 契约变更
 | **实施后调整** | "调用 rudder-adjust 技能，处理 REQ-001 的实施后修改。" |
 | **Commit** | "Review 已通过。调用 rudder-commit 技能，提交并归档 REQ-001。" |
 | **Change** (异常分支) | "调用 rudder-change 技能。REQ-001 需要增加一个忘记密码入口。" |
+
+</details>
 
 > ⚠️ **技能是单一源 + 双投影**：两个 runtime 的文件都由 `skills/rudder-<name>.md` 生成。
 > **修改任一阶段的行为时，只改 `skills/` 下的源文件**，然后运行 `npm run sync:skills`。

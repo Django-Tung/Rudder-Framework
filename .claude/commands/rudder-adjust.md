@@ -34,3 +34,4 @@ argument-hint: [REQ-ID] [Change Description]
 - 已提交或已归档 REQ 不允许原地调整，必须新建 REQ。
 - 契约变更不得在本命令中修改代码。
 - 所有报告和交互必须使用简体中文。
+- 状态变化时附一句人话说明（映射见 `.rudder/workflow/states.md` §4）。

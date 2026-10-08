@@ -173,7 +173,7 @@ function dependentsClosure(edges, id) {
 }
 
 /** A + B：单个 REQ 目录的产物级校验。 */
-function checkArtifacts(dir) {
+export function checkArtifacts(dir) {
   const errors = [];
   const planPath = join(dir, 'plan.md');
   const layoutPath = join(dir, 'layout.md');
@@ -194,10 +194,12 @@ function checkArtifacts(dir) {
     return { errors, artifacts: null, readme: null };
   }
   const planText = readFileSync(planPath, 'utf8');
-  // I1 提取 AC 编号，兼容两种声明格式：`### AC-1: 场景`、`- **AC-1: 功能点**`
-  const acIds = [
-    ...new Set([...planText.matchAll(/^(?:###\s*|-\s*\*\*)(AC-\d+)/gm)].map((m) => m[1])),
-  ];
+  const acMatches = [...planText.matchAll(/^(?:###\s*|-\s*\*\*)(AC-\d+)/gm)].map((m) => m[1]);
+  const duplicates = acMatches.filter((id, index) => acMatches.indexOf(id) !== index);
+  for (const id of new Set(duplicates)) {
+    errors.push(`I3: plan.md 中重复声明 AC 编号 ${id}`);
+  }
+  const acIds = [...new Set(acMatches)];
 
   if (existsSync(tasksPath)) {
     const tasksText = readFileSync(tasksPath, 'utf8');
@@ -368,11 +370,63 @@ function readAcTraceTable(implText) {
     }
     if (!inSection || !line.trim().startsWith('|')) continue;
     const cells = line.split('|').slice(1, -1).map((c) => c.trim());
+    if (cells.length < 3 || cells[0] === 'AC' || /^-+$/.test(cells[0])) continue;
     const ac = cells[0]?.match(/AC-\d+/)?.[0];
     if (!ac) continue;
-    rows.set(ac, cells[1] ?? '');
+    const value = cells[1] ?? '';
+    const existing = rows.get(ac) ?? [];
+    existing.push(value);
+    rows.set(ac, existing);
   }
   return rows;
+}
+
+function parseImplementationLocations(value, rootDir) {
+  const results = [];
+  if (!value || !value.trim()) {
+    return results;
+  }
+
+  for (const raw of value.split(',')) {
+    const item = raw.trim().replace(/^`|`$/g, '').replace(/^"|"$/g, '').replace(/^'|'$/g, '');
+    if (!item) {
+      results.push({ valid: false, error: '空实现位置' });
+      continue;
+    }
+    const match = item.match(/^(.+):([0-9]+)$/);
+    if (!match) {
+      results.push({ valid: false, error: `非法实现位置 ${item}（必须为 relative/path:line）` });
+      continue;
+    }
+    const [, relPathRaw, lineNumberRaw] = match;
+    const relPath = relPathRaw.replace(/\\/g, '/');
+    const lineNumber = Number(lineNumberRaw);
+    if (lineNumber < 1) {
+      results.push({ valid: false, error: `非法行号 ${item}` });
+      continue;
+    }
+    if (relPath.startsWith('/') || relPath.startsWith('http://') || relPath.startsWith('https://') || relPath.includes('..') || relPath.includes('\\') || /^[A-Za-z]:/.test(relPath)) {
+      results.push({ valid: false, error: `越界或绝对路径 ${item}` });
+      continue;
+    }
+    if (!/^(?:src|public)\//.test(relPath)) {
+      results.push({ valid: false, error: `路径必须位于 src/ 或 public/ 下：${item}` });
+      continue;
+    }
+    const fullPath = join(rootDir, relPath);
+    if (!existsSync(fullPath) || !statSync(fullPath).isFile()) {
+      results.push({ valid: false, error: `实现位置指向不存在的文件 ${item}` });
+      continue;
+    }
+    const text = readFileSync(fullPath, 'utf8');
+    const physicalLines = text.split(/\r?\n/).length;
+    if (lineNumber > physicalLines) {
+      results.push({ valid: false, error: `行号超出文件范围 ${item}` });
+      continue;
+    }
+    results.push({ valid: true, path: fullPath, lineNumber, relPath });
+  }
+  return results;
 }
 
 /**
@@ -389,7 +443,6 @@ function checkAcTrace(dir, acIds) {
   const implStatus = readStatus(implPath);
   const hasTable = implText.includes(IMPL_TABLE_HEADING);
 
-  // 核对表是 implement 的对账凭据，COMPLETED 时不得缺席
   if (!hasTable && implStatus === 'COMPLETED') {
     errors.push(`I3: implement=COMPLETED 但缺少「${IMPL_TABLE_HEADING}」（见 .rudder/templates/implement.md）`);
     return errors;
@@ -398,13 +451,27 @@ function checkAcTrace(dir, acIds) {
 
   const rows = readAcTraceTable(implText);
   for (const ac of acIds) {
-    if (!rows.has(ac)) {
+    const valueList = rows.get(ac) ?? [];
+    if (valueList.length === 0) {
       errors.push(`I3: ${ac} 未出现在 implement.md 的「${IMPL_TABLE_HEADING}」中`);
-    } else if (!rows.get(ac)) {
-      errors.push(`I3: ${ac} 的实现位置为空（填不出来即代表未实现）`);
+      continue;
+    }
+    if (valueList.length > 1) {
+      errors.push(`I3: ${ac} 在核对表中重复出现 ${valueList.length} 次`);
+    }
+    const allLocations = valueList.flatMap((value) => parseImplementationLocations(value, dir));
+    const invalid = allLocations.filter((v) => !v.valid);
+    for (const entry of invalid) {
+      errors.push(`I3: ${ac} 的实现位置无效：${entry.error}`);
+    }
+    if (allLocations.length > 0 && allLocations.every((v) => v.valid)) {
+      const lineText = readFileSync(allLocations[0].path, 'utf8').split(/\r?\n/)[allLocations[0].lineNumber - 1] ?? '';
+      if (/TODO|TBD|FIXME|placeholder|待实现/i.test(lineText) && !/[A-Za-z0-9\u4e00-\u9fa5]/.test(lineText.replace(/[^A-Za-z0-9\u4e00-\u9fa5]/g, ''))) {
+        // warning: placeholder-only line is not a hard failure
+      }
     }
   }
-  // 核对表里的编号必须来自 plan.md，防止为凑行数编造 AC
+
   const known = new Set(acIds);
   for (const ac of rows.keys()) {
     if (!known.has(ac)) errors.push(`I3: 核对表中的 ${ac} 在 plan.md 中不存在`);
@@ -420,7 +487,7 @@ const VAGUE_RESPONSIVE = /自适应|响应式良好|响应式设计良好|支持
  * 口径写法见模板：plan.md 的 `- **响应式要求**：` 必须以 `需要` / `不需要` 开头；
  * layout.md 的 `- 响应式行为：` 在「不需要」时必须写 `本 REQ 无响应式要求`。
  */
-function checkResponsive(dir) {
+export function checkResponsive(dir) {
   const errors = [];
   const planPath = join(dir, 'plan.md');
   const layoutPath = join(dir, 'layout.md');
@@ -433,6 +500,7 @@ function checkResponsive(dir) {
     return errors;
   }
   const planValue = planLine[1].trim();
+  const planNormalized = planValue.replace(/\s+/g, '');
   let planNeeds;
   if (planValue.startsWith('不需要')) planNeeds = false;
   else if (planValue.startsWith('需要')) planNeeds = true;
@@ -449,16 +517,39 @@ function checkResponsive(dir) {
     return errors;
   }
   const layoutValue = layoutLine[1].trim();
+  const layoutNormalized = layoutValue.replace(/\s+/g, '');
   const layoutNeeds = !layoutValue.includes('本 REQ 无响应式要求');
 
   if (planNeeds !== layoutNeeds) {
-    errors.push(
-      `I4: 响应式口径不一致——plan.md「${planValue}」vs layout.md「${layoutValue}」`,
-    );
+    errors.push(`I4: 响应式口径不一致——plan.md「${planValue}」vs layout.md「${layoutValue}」`);
   }
-  // 需要响应式却只写了「自适应」这类空话，等于没写
-  if (planNeeds && VAGUE_RESPONSIVE.test(layoutValue)) {
-    errors.push(`I4: layout.md 的「响应式行为」含无信息量表述（${layoutValue}），须写明具体断点与变化`);
+
+  if (planNeeds) {
+    if (!/[0-9]+(?:px|rem|em)/i.test(planValue)) {
+      errors.push('I4: plan.md 的响应式要求缺少具体断点（例如 768px / 1024px）');
+    }
+    if (!/(隐藏|收起|展开|重排|折叠|横向滚动|stack|column|grid|flex|双栏|两列)/i.test(planValue)) {
+      errors.push('I4: plan.md 的响应式要求缺少具体行为动作描述');
+    }
+    if (planNormalized.length < 10) {
+      errors.push('I4: plan.md 的响应式要求过短，必须写明断点与行为');
+    }
+    if (!/[0-9]+(?:px|rem|em)/i.test(layoutValue) || !/(隐藏|收起|展开|重排|折叠|横向滚动|stack|column|grid|flex|双栏|两列)/i.test(layoutValue)) {
+      errors.push('I4: layout.md 的响应式行为必须写明至少一个断点和一个具体动作');
+    }
+    if (layoutNormalized.length < 10) {
+      errors.push('I4: layout.md 的响应式行为过短');
+    }
+    if (VAGUE_RESPONSIVE.test(layoutValue) && !/[0-9]+(?:px|rem|em)/i.test(layoutValue)) {
+      errors.push(`I4: layout.md 的「响应式行为」含无信息量表述（${layoutValue}），须写明具体断点与变化`);
+    }
+  } else {
+    if (planNormalized.length <= 8 || planValue === '不需要') {
+      errors.push('I4: 不需要响应式时，plan.md 必须给出充分理由；仅写“不需要”不合规');
+    }
+    if (!layoutValue.includes('本 REQ 无响应式要求')) {
+      errors.push('I4: layout.md 在不需要响应式时必须写「本 REQ 无响应式要求」');
+    }
   }
   return errors;
 }

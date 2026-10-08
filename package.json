@@ -7,12 +7,17 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "build:show": "vite build --config vite.show.config.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "check:req": "node scripts/check-req.js",
+    "check:assets": "node scripts/check-assets.js",
+    "check:acceptance": "node scripts/check-acceptance.js",
+    "check:all": "node scripts/check-all.js",
     "sync:master": "node scripts/sync-master-prd.js",
     "sync:skills": "node scripts/sync-skills.js",
-    "check:skills": "node scripts/sync-skills.js --check"
+    "check:skills": "node scripts/sync-skills.js --check",
+    "test": "node scripts/run-tests.js"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",
@@ -43,6 +48,7 @@
     "tailwindcss": "^4.3.3",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.70.0",
-    "vite": "^8.3.0"
+    "vite": "^8.3.0",
+    "vite-plugin-singlefile": "^2.3.3"
   }
 }

@@ -54,6 +54,18 @@ PENDING
 
 无。
 
+## Machine Verification
+
+- [ ] I1 (AC 拆解完备)
+- [ ] I2 (无虚假完成)
+- [ ] I3 (实现位置对账)
+- [ ] I4 (响应式口径一致)
+- [ ] Assets (零外链依赖)
+- [ ] Lint
+- [ ] Build
+
+**Result**: PENDING
+
 ## 机器检查证据 (Machine Checks)
 
 按顺序记录以下命令的完整终端输出：
@@ -63,6 +75,8 @@ PENDING
 - `npm run build`
 - `npm run check:skills`
 - `npm run check:req`
+- `npm run check:assets`
+- `npm run check:all`
 
 所有命令通过后，`implement.md` 才能设置为 `COMPLETED`。
 

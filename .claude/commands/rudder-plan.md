@@ -43,12 +43,12 @@ Transform a vague idea or a rough user-task skeleton into a detailed, contract-f
 6. **Gate**:
    - Set `plan.md` `status` to `DRAFT`, and sync `README.md` `status` to `PLANNED` (derived value, see `.rudder/workflow/states.md`).
   - Present the core PRD, the layout diagram, and the created `REQ-ID` to the user; direct the user to review both `plan.md` and `layout.md`.
-  - Always give the next-step handoff: tell the user to run `/rudder-plan-confirm REQ-XXX` (or invoke `rudder-plan-confirm` in Hermes) to review and confirm the PRD, then explicitly approve it. The command call itself is not approval.
-  - State that invoking the confirmation command alone is not approval. Keep `plan.md` as `DRAFT` until `rudder-plan-confirm` receives explicit human approval.
+  - Always give the next-step handoff: tell the user to run `/rudder-plan-confirm REQ-XXX` (or invoke `rudder-plan-confirm` in Hermes) to review and confirm the PRD. **That invocation IS the approval action** — no extra approval phrase is needed.
+  - State that only the human may initiate that command: the Agent **MUST NOT** invoke `rudder-plan-confirm` itself, nor approve by inertia after answering clarifications. Keep `plan.md` as `DRAFT` until the human initiates it.
 
 ## 🗣️ Interaction & Output Constraints (STRICT)
 - **User Interaction**: ALL clarification questions and the final approval prompt **MUST be in Chinese**.
-  - *Required Approval Prompt*: "请先 Review `plan.md` 和 `layout.md`。确认无误后，下一步请执行 `/rudder-plan-confirm REQ-XXX`（Hermes 用户请调用 `rudder-plan-confirm`）确认 PRD，并明确回复：**PRD 批准，状态改为 APPROVED**。"
+  - *Required Approval Prompt*: "请先 Review `plan.md` 和 `layout.md`。确认无误后，执行 `/rudder-plan-confirm REQ-XXX`（Hermes 用户请调用 `rudder-plan-confirm`）——**该命令即代表批准**，不需要再回复任何批准语。"
 - **Layout Document**: `layout.md` **MUST** be written in Chinese except for technical terms and component names; it is a Plan companion document and **MUST NOT** carry `status` or `phase` fields.
 - **Business Content**: The entire content of `plan.md` (Background, Stories, ACs, Page Structure) **MUST be written in Chinese**. Technical terms, component names, and YAML keys can remain in English.
 - **UI Style Confirmation**: The primary UI style is a preset package chosen by the human from `docs/styles/` and recorded in `MASTER-PRD.md`. The Agent **MUST NOT** invent a style name or describe one in prose. However, when the human says "you decide", adopting the default `P1` and recording `来源：用户未指定，采用默认预设` is **required**, not optional — the flow must never stall on a style question.

@@ -119,7 +119,7 @@ REQ 目录创建后，必须对每个 REQ 单独执行 `/rudder-plan`：
 
 此时才补充用户故事、AC、页面结构、UI 三态、数据模型和技术契约。
 
-Plan 完成后先 Review 新计划，再对该 REQ 执行 `/rudder-plan-confirm REQ-001`，并明确批准。**命令调用本身不代表批准。**
+Plan 完成后先 Review 新计划，再对该 REQ 执行 `/rudder-plan-confirm REQ-001`。**执行该命令本身就是批准**，不需要再回复批准语。
 
 ### 方式 B：直接描述需求
 
@@ -135,13 +135,9 @@ Agent 会先提出澄清问题，然后在 `requirements/REQ-XXX-<name>/` 下生
 /rudder-plan-confirm REQ-001
 ```
 
-然后明确回复：
+**这条命令就是批准动作，不需要再回复批准语。** 确认命令会先检查未解决的问题；若还有未确认事项，它会提问并保持 `plan.md` 为 `DRAFT`，等你回答后再重新执行一次。
 
-```text
-PRD 批准，状态改为 APPROVED
-```
-
-如果使用 Hermes，请调用 `rudder-plan-confirm` 技能并提供对应的 REQ-ID。确认命令会检查未解决的问题；**命令调用本身不代表批准**。只有收到明确批准且 `npm run check:req` 通过后，才能开始 `/rudder-implement`。
+如果使用 Hermes，请调用 `rudder-plan-confirm` 技能并提供对应的 REQ-ID，效果相同。只有批准且 `npm run check:req` 通过后，才能开始 `/rudder-implement`。
 
 ## 6. 实施和提交需求
 
@@ -204,7 +200,7 @@ flowchart TD
 /rudder-change REQ-001 增加按供应商状态筛选的功能
 ```
 
-变更流程会更新 `plan.md` 中的用户故事和 AC，记录包含日期、内容、原因、影响范围的 Change Log，并将 `plan.md` 退回 `DRAFT`、`tasks.md` 退回 `DRAFT`、`implement.md` 标记为 `OUTDATED`。在你 Review 新计划并回复“PRD 批准，状态改为 APPROVED”之前，代码保持冻结；批准后再重新拆解 Tasks、实施并验证。
+变更流程会更新 `plan.md` 中的用户故事和 AC，记录包含日期、内容、原因、影响范围的 Change Log，并将 `plan.md` 退回 `DRAFT`、`tasks.md` 退回 `DRAFT`、`implement.md` 标记为 `OUTDATED`。在你 Review 新计划并重新执行 `/rudder-plan-confirm REQ-XXX` 之前，代码保持冻结；批准后再重新拆解 Tasks、实施并验证。
 
 如果修改会影响其他 REQ，依赖需求会被标记为 `STALE`。是否确实受影响由人工逐个判断，不要自行清除该标记。已提交或归档的需求同样不能原地变更，应新建 REQ。
 
@@ -271,7 +267,7 @@ npm run check:req
 |---|---|---|
 | 导入需求文档 | `/rudder-import <文档路径>` | 导入 `.docx`、`.md` 或 `.txt`，分析拆分后等待人工批准 |
 | 创建或细化需求 | `/rudder-plan <需求描述或 REQ-ID>` | 新建需求，或细化导入生成的 REQ 计划 |
-| 确认 PRD | `/rudder-plan-confirm <REQ-ID>` | PRD 批准状态或澄清项仍不明确时使用 |
+| 确认 PRD | `/rudder-plan-confirm <REQ-ID>` | Review 计划后执行，**执行即批准**；有澄清项时它会先提问 |
 | 实施需求 | `/rudder-implement <REQ-ID>` | PRD 已批准后拆分任务、实施并执行质量检查 |
 | 修正已完成实现 | `/rudder-adjust <REQ-ID> <修改说明>` | Implement 已完成但未提交，且修改不改变需求契约 |
 | 变更需求契约 | `/rudder-change <REQ-ID> <变更说明>` | 修改验收标准、范围、页面或数据契约 |

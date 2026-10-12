@@ -34,8 +34,9 @@
    - `tasks.md` → `DRAFT`（旧任务清单需重新拆解）
    - `implement.md` → `OUTDATED`（清空核心实现摘要）
    - `README.md` → 顶层 `status` = `IMPLEMENTING`（推导结果）
-4. **代码冻结**：在人工回复"PRD 批准"前，**严禁**修改 `src/` 下任何代码。
-5. **重新批准**：人工批准后，`OUTDATED` 由 Implement 阶段重置回 `IN_PROGRESS` 起算，
+4. **代码冻结**：在人工重新发起 `/rudder-plan-confirm REQ-XXX` 前，**严禁**修改 `src/` 下任何代码。
+   Agent 不得自行调用该命令解除冻结。
+5. **重新批准**：人工发起 `/rudder-plan-confirm` 后，`OUTDATED` 由 Implement 阶段重置回 `IN_PROGRESS` 起算，
    重新走 Tasks → Implement。
 
 ### 4.1 跨 REQ 传导（下游标记 STALE）

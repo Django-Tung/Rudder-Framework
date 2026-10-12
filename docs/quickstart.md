@@ -38,7 +38,7 @@
 | 我临时要加个功能（**需求变了**） | `/rudder-change REQ-001 增加按状态筛选` |
 | 满意了，提交存档 | `/rudder-commit REQ-001` |
 
-> ⚠️ **调 `plan-confirm` 不等于批准**——批准是你明确回一句「PRD 批准，状态改为 APPROVED」。
+> ✅ **执行 `/rudder-plan-confirm REQ-001` 就是批准**——Review 完计划、确认没问题，跑这一条命令即可，不用再回任何批准语。
 
 ---
 

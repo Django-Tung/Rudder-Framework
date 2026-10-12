@@ -29,7 +29,7 @@ Extract the target REQ-ID and the description of the change from user input. If 
    - `implement.md` -> `OUTDATED` (clear the core implementation summary)
    - `README.md` -> `status: IMPLEMENTING` (derived value, see `.rudder/workflow/states.md`)
 3. **Code Freeze**:
-   - **STRICT CONSTRAINT**: **FORBIDDEN** to modify any code under `src/` before the user replies "PRD 批准".
+   - **STRICT CONSTRAINT**: **FORBIDDEN** to modify any code under `src/` before the human re-invokes `/rudder-plan-confirm REQ-XXX`. That invocation is the re-approval; the Agent **MUST NOT** invoke it itself.
 4. **Report**: Inform the user that changes are logged, downstream evidence is invalidated, and code is frozen.
 5. **Propagate Cross-REQ (only after the contract is confirmed truly affected)**: Compute the dependents of this REQ from the `依赖` column of `MASTER-PRD.md`'s `AUTO-INDEX`, and mark each of them `stale: true` with `stale_reason` (this REQ's ID) and `stale_since`. Marking is machine work; **the judgement of whether each dependent is truly affected belongs to the human**, one hop at a time. The Agent **MUST NOT** clear a `STALE` flag on its own.
 
@@ -37,4 +37,4 @@ Extract the target REQ-ID and the description of the change from user input. If 
 - **Change Log**: The content of the `Change Log` in `plan.md` **MUST be written in Chinese**.
 - **User Interaction**: The report informing the user about the freeze and requesting re-approval **MUST be in Chinese**.
 - **Human-facing Status**: the cascading invalidation (`plan.md` → `DRAFT`, `tasks.md` → `DRAFT`, `implement.md` → `OUTDATED`) **MUST** be reported in plain Chinese using the mapping in `.rudder/workflow/states.md` §4 (e.g. "⚠️ 需求改过了，这份实现作废，要重新做"), together with the concrete next action the user must take.
-  - *Required Prompt*: "需求变更已记录，下游证据已级联失效，代码已冻结。请 Review 新的 plan.md。确认无误后，请回复：**PRD 批准，状态改为 APPROVED** 以解冻代码。"
+  - *Required Prompt*: "需求变更已记录，下游证据已级联失效，代码已冻结。请 Review 新的 plan.md。确认无误后，执行 `/rudder-plan-confirm REQ-XXX` 以解冻代码——**该命令即代表批准**，不需要再回复任何批准语。"

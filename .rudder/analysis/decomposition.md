@@ -86,7 +86,9 @@ pending_maps:
    **不得在两处同时登记**。
 
 > 批准点是 `/rudder-import` 命令**内部的暂停**，**不是**一个独立的批准命令。
-> 这与 `/rudder-plan` 等待"PRD 批准"的既有交互范式一致。
+> 它体现的是同一条原则：**批准必须由人工显式表态**。Plan 阶段的批准载体是人工发起
+> `/rudder-plan-confirm REQ-XXX`（见 [`../workflow/states.md`](../workflow/states.md) §1.1），
+> 拆分阶段没有独立命令，因此载体是命令内的一次回复。
 
 ## 6. 路径 B 跳过拆分
 

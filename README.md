@@ -136,9 +136,9 @@ imported ──[粗读+拆分]──► analyzed ──[人工确认]──► a
    ↓ 人工确认“拆分批准，创建 REQ 目录”
 /rudder-plan REQ-001
 /rudder-plan REQ-002
-   ↓ 对每个 REQ 执行 /rudder-plan-confirm REQ-XXX 并明确批准
+   ↓ 对每个 REQ 执行 /rudder-plan-confirm REQ-XXX（执行该命令即批准）
 /rudder-implement REQ-001
-此时才补充用户故事、AC、页面结构、UI 三态、数据模型和技术契约。Plan 完成后先 Review，再对每个 REQ 执行 `/rudder-plan-confirm REQ-XXX` 并明确批准；命令调用本身不代表批准。
+此时才补充用户故事、AC、页面结构、UI 三态、数据模型和技术契约。Plan 完成后先 Review，再对每个 REQ 执行 `/rudder-plan-confirm REQ-XXX`——**执行该命令本身就是批准**，不需要再回复任何批准语。
 
 > **只支持 `.docx` / `.md` / `.txt`。PDF 与 xlsx 明确不受支持**（Non-Goal，见 `.rudder/import/sources.md` §5）。
 > `requirements/_inbox/` 已降级为临时暂存，仅保留 `fixtures/`，**不再承载任何管道产物**。
@@ -154,8 +154,7 @@ imported ──[粗读+拆分]──► analyzed ──[人工确认]──► a
 
 ```text
 /rudder-plan 用户登录功能，需要邮箱密码和记住我
-   ↓ Review plan.md 后执行 /rudder-plan-confirm REQ-001
-   ↓ 明确回复“PRD 批准，状态改为 APPROVED”
+   ↓ Review plan.md 后执行 /rudder-plan-confirm REQ-001（执行即批准）
 /rudder-implement REQ-001
 ```
 
@@ -199,7 +198,7 @@ PLANNED ──► IMPLEMENTING ──► IMPLEMENTED ──► COMMITTED
    - ⚠️ 验收标准必须以 `AC-1` / `AC-2` 形式编号，且 `tasks.md` 拆解时逐条引用——
      `npm run check:req` 的 **I1（拆解完备）** 依赖此格式，编号不规范会让该校验形同虚设。
    - **非目标**是防范围蔓延的硬边界，Implement 完成检查会逐条核对。
-6. **门控 (Gate)**：Agent 将 `plan.md` 保持为 `DRAFT`，展示核心内容和 `layout.md`。明确提示用户 Review 两份文档后执行 `/rudder-plan-confirm REQ-XXX`（Hermes 用户调用 `rudder-plan-confirm`），再明确回复："**PRD 批准，状态改为 APPROVED**"。命令调用本身不代表批准；有未确认事项时先澄清，不得推进 Implement。
+6. **门控 (Gate)**：Agent 将 `plan.md` 保持为 `DRAFT`，展示核心内容和 `layout.md`。明确提示用户 Review 两份文档后执行 `/rudder-plan-confirm REQ-XXX`（Hermes 用户调用 `rudder-plan-confirm`）——**该命令即代表批准**，无需再回复批准语。Agent 不得自行调用该命令，也不得在澄清问答后顺势批准；有未确认事项时先澄清，不得推进 Implement。
 
 ### 阶段 2：Implement (代码实施)
 
@@ -242,8 +241,8 @@ PLANNED ──► IMPLEMENTING ──► IMPLEMENTED ──► COMMITTED
 1. 更新 `plan.md` 的 User Stories / AC，并在文末追加 `## 📝 Change Log`（**日期、内容、原因、影响范围**四要素）。
 2. `plan.md` 重置为 `DRAFT`，等待人工重新批准。
 3. **级联失效**（逐文件）：`tasks.md`→`DRAFT`、`implement.md`→`OUTDATED`、顶层状态→`IMPLEMENTING`。
-4. **代码冻结**：人工回复"PRD 批准"前，严禁修改 `src/` 下任何代码。
-5. 批准后，`OUTDATED` 由 Implement 阶段重置回 `IN_PROGRESS` 起算，重走 Tasks → Implement。
+4. **代码冻结**：人工重新执行 `/rudder-plan-confirm REQ-XXX` 前，严禁修改 `src/` 下任何代码。
+5. 重新批准后，`OUTDATED` 由 Implement 阶段重置回 `IN_PROGRESS` 起算，重走 Tasks → Implement。
 
 | 产物 | 变更后状态 | 含义 |
 | :--- | :--- | :--- |
@@ -287,7 +286,7 @@ REQ-001 契约变更
 | :--- | :--- |
 | **路径 A：Import** | `/rudder-import 需求文档.docx` |
 | **路径 B：Plan** | `/rudder-plan 用户登录功能，需要邮箱密码和记住我` |
-| **Plan 确认** | `/rudder-plan-confirm REQ-001`，Review 后明确回复“PRD 批准，状态改为 APPROVED” |
+| **Plan 确认** | `/rudder-plan-confirm REQ-001`（Review 后执行该命令即批准） |
 | **Implement** | `/rudder-implement REQ-001` |
 | **实施后调整** | `/rudder-adjust REQ-001 修改内容` |
 | **Commit** | `/rudder-commit REQ-001` |
@@ -302,7 +301,7 @@ REQ-001 契约变更
 | :--- | :--- |
 | **路径 A：Import** | "调用 rudder-import 技能，导入需求文档.docx。" |
 | **路径 B：Plan** | "调用 rudder-plan 技能。我想做一个用户登录功能，需要邮箱密码和记住我。" |
-| **Plan 确认** | "Review 完成。调用 rudder-plan-confirm 技能确认 REQ-001；PRD 批准，状态改为 APPROVED。" |
+| **Plan 确认** | "Review 完成。调用 rudder-plan-confirm 技能确认 REQ-001。"（该调用即批准） |
 | **Implement** | "PRD 已批准。调用 rudder-implement 技能，开始实施 REQ-001。" |
 | **实施后调整** | "调用 rudder-adjust 技能，处理 REQ-001 的实施后修改。" |
 | **Commit** | "Review 已通过。调用 rudder-commit 技能，提交并归档 REQ-001。" |
@@ -341,7 +340,7 @@ npm run sync:master -- --check   # 只校验索引与事实是否一致，不写
 >
 > **输入（Hermes）**："调用 rudder-change 技能。REQ-001 需要增加一个忘记密码入口。"
 
-AI 会更新 `plan.md`（含 Change Log）、退回 `DRAFT`，并级联失效下游证据。此后 AI **必须停手**，直到你回复"**PRD 批准**"。
+AI 会更新 `plan.md`（含 Change Log）、退回 `DRAFT`，并级联失效下游证据。此后 AI **必须停手**，直到你重新执行 `/rudder-plan-confirm REQ-XXX` 解除冻结。
 
 ### 场景 D：代码偏离预期，需要整体回滚
 

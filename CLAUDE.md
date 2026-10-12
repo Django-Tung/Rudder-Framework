@@ -21,7 +21,7 @@
 | `/rudder-import [文档路径]` | 路径 A：导入 .docx/.md/.txt → 分析拆分 → **暂停等人工批准** → 批量产出 REQ 目录 |
 | `/rudder-plan [需求描述]` | 路径 B：澄清需求 → 生成 `plan.md`（PRD + 技术契约）与 `layout.md`（布局图） |
 | `/rudder-implement [REQ-ID]` | 拆解 `tasks.md` 后按契约实施 Types → Mocks → Services → UI |
-| `/rudder-plan-confirm [REQ-ID]` | 处理 PRD 确认不清楚的情况并推进批准 |
+| `/rudder-plan-confirm [REQ-ID]` | Review 并批准 PRD：**人工发起该命令即批准**；有未决澄清项时先提问 |
 | `/rudder-adjust [REQ-ID] [修改内容]` | 实施完成后的修改；契约变更转交 `rudder-change` |
 | `/rudder-commit [REQ-ID]` | 校验五项前置状态 → 原子 git 提交 + 归档 |
 | `/rudder-change [REQ-ID] [变更]` | 需求变更：更新 PRD + 级联失效 + 代码冻结，并向下游传导 `STALE` |

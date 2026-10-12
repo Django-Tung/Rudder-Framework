@@ -173,7 +173,11 @@ function dependentsClosure(edges, id) {
 }
 
 /** A + B：单个 REQ 目录的产物级校验。 */
-export function checkArtifacts(dir) {
+/**
+ * @param {string} dir        REQ 目录（`requirements/REQ-XXX-name/`）
+ * @param {string} [rootDir]  仓库根，用于解析 `implement.md` 中的实现位置；默认 `ROOT`
+ */
+export function checkArtifacts(dir, rootDir = ROOT) {
   const errors = [];
   const planPath = join(dir, 'plan.md');
   const layoutPath = join(dir, 'layout.md');
@@ -275,7 +279,7 @@ export function checkArtifacts(dir) {
     errors.push(`stale 取值非法: ${readme.stale}（应为 true 或 false）`);
   }
 
-  return { errors: [...errors, ...checkAcTrace(dir, acIds), ...checkResponsive(dir)], artifacts, readme };
+  return { errors: [...errors, ...checkAcTrace(dir, acIds, rootDir), ...checkResponsive(dir)], artifacts, readme };
 }
 
 /** C + D：全仓依赖图与 STALE 一致性。 */
@@ -381,6 +385,13 @@ function readAcTraceTable(implText) {
   return rows;
 }
 
+/**
+ * 解析核对表里的「实现位置」。
+ *
+ * ⚠️ `rootDir` 是**仓库根**，不是 REQ 目录：`implement.md` 中记的是
+ * `src/pages/xxx.tsx:00` 这类**相对仓库根**的路径（见 `.rudder/templates/implement.md`）。
+ * 曾因误传 REQ 目录，导致所有实现位置被判为「指向不存在的文件」。
+ */
 function parseImplementationLocations(value, rootDir) {
   const results = [];
   if (!value || !value.trim()) {
@@ -434,7 +445,7 @@ function parseImplementationLocations(value, rootDir) {
  * 「填不出来 = 没有实现」——这是本轮唯一能把「勾完任务即完成」变成
  * 「必须落到具体代码行」的确定性断言。
  */
-function checkAcTrace(dir, acIds) {
+function checkAcTrace(dir, acIds, rootDir) {
   const errors = [];
   const implPath = join(dir, 'implement.md');
   if (!existsSync(implPath)) return errors;
@@ -459,7 +470,7 @@ function checkAcTrace(dir, acIds) {
     if (valueList.length > 1) {
       errors.push(`I3: ${ac} 在核对表中重复出现 ${valueList.length} 次`);
     }
-    const allLocations = valueList.flatMap((value) => parseImplementationLocations(value, dir));
+    const allLocations = valueList.flatMap((value) => parseImplementationLocations(value, rootDir));
     const invalid = allLocations.filter((v) => !v.valid);
     for (const entry of invalid) {
       errors.push(`I3: ${ac} 的实现位置无效：${entry.error}`);

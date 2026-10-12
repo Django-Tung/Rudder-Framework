@@ -32,8 +32,20 @@ function writeReqFixture(root, { plan = '', layout = '', tasks = '', impl = '', 
   if (readme) writeFileSync(join(root, 'README.md'), readme, 'utf8');
 }
 
-function testCheckReqI3Valid() {
+/**
+ * 复刻生产布局：REQ 目录**嵌在仓库根之下**，`src/` 在仓库根。
+ * 若把 fixture 直接铺在仓库根（即 `dir === root`），就会掩盖
+ * 「实现位置按 REQ 目录解析」这一类路径 bug。
+ */
+function makeRepoFixture() {
   const root = makeTempDir();
+  const reqDir = join(root, 'requirements', 'REQ-001-test');
+  mkdirSync(reqDir, { recursive: true });
+  return { root, reqDir };
+}
+
+function testCheckReqI3Valid() {
+  const { root, reqDir } = makeRepoFixture();
   try {
     const plan = `---\nstatus: APPROVED\n---\n\n# Plan\n- **AC-1: 进入页面**\n- **AC-2: 提交表单**\n- **响应式要求**：不需要 —— 页面是单列布局，现阶段无需为小屏额外重排。\n`;
     const layout = `# Layout\n- 响应式行为：本 REQ 无响应式要求\n`;
@@ -43,9 +55,9 @@ function testCheckReqI3Valid() {
       join(root, 'src', 'App.tsx'),
       'export const A = 1;\nexport const B = 2;\nexport const C = 3;\nexport const D = 4;\nexport const E = 5;\nexport const F = 6;\nexport const G = 7;\nexport const H = 8;\nexport const I = 9;\nexport const J = 10;\nexport const K = 11;\nexport const L = 12;\nexport const M = 13;\nexport const N = 14;\nexport const O = 15;\nexport const P = 16;\nexport const Q = 17;\nexport const R = 18;\nexport const S = 19;\nexport const T = 20;\n',
     );
-    writeFileSync(join(root, 'commit.md'), '---\nstatus: PENDING\n---\n');
-    writeReqFixture(root, { plan, layout, impl, tasks: '---\nstatus: DONE\n---\n- [x] AC-1\n- [x] AC-2\n', readme: '---\nid: REQ-001\ntitle: 测试需求\nstatus: IMPLEMENTED\nsource: 人工登记\ndeps: []\nstale: false\n---\n' });
-    const result = checkArtifacts(root);
+    writeFileSync(join(reqDir, 'commit.md'), '---\nstatus: PENDING\n---\n');
+    writeReqFixture(reqDir, { plan, layout, impl, tasks: '---\nstatus: DONE\n---\n- [x] AC-1\n- [x] AC-2\n', readme: '---\nid: REQ-001\ntitle: 测试需求\nstatus: IMPLEMENTED\nsource: 人工登记\ndeps: []\nstale: false\n---\n' });
+    const result = checkArtifacts(reqDir, root);
     assert.equal(result.errors.length, 0, `expected no I3 errors but got: ${result.errors.join(', ')}`);
   } finally {
     rmSync(root, { recursive: true, force: true });
@@ -53,12 +65,12 @@ function testCheckReqI3Valid() {
 }
 
 function testCheckReqI3MissingFile() {
-  const root = makeTempDir();
+  const { root, reqDir } = makeRepoFixture();
   try {
     const plan = `---\nstatus: APPROVED\n---\n\n# Plan\n- **AC-1: 进入页面**\n`;
     const impl = `---\nstatus: COMPLETED\n---\n\n## AC 实现核对表\n| AC | 实现位置（文件:行） | 核对结论 |\n|---|---|---|\n| AC-1 | \`src/Missing.tsx:10\` | ☐ |\n`;
-    writeReqFixture(root, { plan, impl, tasks: '---\nstatus: DONE\n---\n- [x] AC-1\n', readme: '---\nid: REQ-001\nstatus: IMPLEMENTED\nsource: 人工登记\ndeps: []\nstale: false\n---\n' });
-    const result = checkArtifacts(root);
+    writeReqFixture(reqDir, { plan, impl, tasks: '---\nstatus: DONE\n---\n- [x] AC-1\n', readme: '---\nid: REQ-001\nstatus: IMPLEMENTED\nsource: 人工登记\ndeps: []\nstale: false\n---\n' });
+    const result = checkArtifacts(reqDir, root);
     assert.ok(result.errors.some((e) => e.includes('I3') && e.includes('不存在')), 'expected missing file error');
   } finally {
     rmSync(root, { recursive: true, force: true });

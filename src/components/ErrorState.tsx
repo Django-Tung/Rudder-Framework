@@ -1,40 +1,56 @@
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { TriangleAlert } from 'lucide-react';
 
 import { Button } from '@/components/Button';
-import { text } from '@/design/tokens';
+import { ALERT_ERROR } from '@/design/tokens';
+import { cn } from '@/lib/cn';
 
-interface ErrorStateProps {
-  /** 面向用户的中文错误说明，如「加载供应商失败，请稍后重试」 */
+export interface IErrorStateProps {
+  /** 具体原因，用简体中文说清楚「什么失败了」，不要只写「出错了」 */
   message: string;
-  /** 是否提供「重试」按钮 */
+  /** 简短标题，默认「加载失败」 */
+  title?: string;
+  /** 重试回调。不传则不渲染重试按钮 */
   onRetry?: () => void;
-  /** 重试中的文案 */
-  retrying?: boolean;
+  /** 重试按钮文案，默认「重试」 */
+  retryText?: string;
+  className?: string;
 }
 
 /**
- * 错误状态。**取数 UI 的 Error 态必须使用本组件**。
- * 文案必须为简体中文，且**不得**暴露技术细节（状态码、堆栈、字段名）。
+ * 请求失败状态。
+ *
+ * 与 `EmptyState` 的区别：空态是「本来就没有数据」，错误态是「这次没取到」。
+ * 因此错误态**必须**给出重试入口，否则使用者只能刷新整页。
  */
-export function ErrorState({ message, onRetry, retrying = false }: ErrorStateProps) {
+export function ErrorState({
+  message,
+  title = '加载失败',
+  onRetry,
+  retryText = '重试',
+  className,
+}: IErrorStateProps) {
   return (
     <div
       role="alert"
-      className="flex flex-col items-center justify-center rounded-md border border-l-4 border-danger-600/30 border-l-danger-600 bg-surface-card px-6 py-10 text-center"
-    >
-      <AlertCircle aria-hidden="true" className="mb-3 size-8 text-danger-600" />
-      <p className={`${text.body} text-text-primary`}>{message}</p>
-      {onRetry && (
-        <Button
-          variant="secondary"
-          className="mt-4"
-          onClick={onRetry}
-          disabled={retrying}
-        >
-          <RefreshCw aria-hidden="true" className={`size-4 ${retrying ? 'animate-spin' : ''}`} />
-          {retrying ? '重试中' : '重试'}
-        </Button>
+      className={cn(
+        ALERT_ERROR,
+        'flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between',
+        className,
       )}
+    >
+      <div className="flex items-start gap-3">
+        <TriangleAlert className="size-5 shrink-0 text-danger-600" aria-hidden />
+        <div className="flex flex-col gap-1">
+          <p className="text-body font-medium text-text-primary">{title}</p>
+          <p className="text-body text-text-secondary">{message}</p>
+        </div>
+      </div>
+
+      {onRetry ? (
+        <Button variant="secondary" size="sm" onClick={onRetry}>
+          {retryText}
+        </Button>
+      ) : null}
     </div>
   );
 }

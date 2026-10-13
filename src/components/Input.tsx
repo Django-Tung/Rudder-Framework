@@ -1,52 +1,64 @@
-import type { InputHTMLAttributes, ReactNode } from 'react';
+import type { ComponentPropsWithRef } from 'react';
 import { useId } from 'react';
 
-import { INPUT } from '@/design/tokens';
+import {
+  CONTROL_BASE,
+  CONTROL_BORDER_DEFAULT,
+  CONTROL_BORDER_ERROR,
+  CONTROL_DISABLED,
+  CONTROL_FOCUS,
+} from '@/design/tokens';
+import { cn } from '@/lib/cn';
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface IInputProps extends ComponentPropsWithRef<'input'> {
+  /** 字段标签。传入后会自动与输入框通过 `htmlFor` 关联 */
   label?: string;
-  /** 校验错误提示（简体中文），传入即进入错误态 */
+  /** 错误提示。传入即进入错误态：危险色描边 + `aria-invalid` + 下方中文提示 */
   error?: string;
-  /** 字段下方的辅助说明（简体中文） */
+  /** 辅助说明。与 `error` 互斥展示，错误优先 */
   hint?: string;
-  /** 自定义右侧内容，如字数计数 */
-  addon?: ReactNode;
 }
 
 /**
- * 通用输入框，自带标签 / 错误 / 辅助说明三态。
- * 同类表单控件必须复用本组件。
+ * 单行输入框（四态：默认 / 聚焦 / 错误 / 禁用）。
+ *
+ * 错误态用「二选一」而非叠加：`error ? CONTROL_BORDER_ERROR : CONTROL_BORDER_DEFAULT`。
+ * 两个描边类都只声明 `border-*` 一个维度，同时出现时谁生效取决于 CSS 输出顺序，
+ * 所以不能靠 `cn()` 的先后顺序覆盖（见 `src/lib/cn.ts` 的说明）。
  */
-export function Input({ label, error, hint, addon, className = '', id, ...rest }: InputProps) {
-  const generatedId = useId();
-  const inputId = id ?? generatedId;
+export function Input({ label, error, hint, className, id, ...props }: IInputProps) {
+  const autoId = useId();
+  const inputId = id ?? `input-${autoId}`;
+  const messageId = `${inputId}-message`;
+  const message = error ?? hint;
+  const invalid = Boolean(error);
 
   return (
-    <div className="w-full">
-      {label && (
-        <label htmlFor={inputId} className="mb-1.5 block text-body text-text-secondary">
+    <div className="flex w-full flex-col gap-1.5">
+      {label ? (
+        <label htmlFor={inputId} className="text-ui font-medium text-text-primary">
           {label}
         </label>
-      )}
+      ) : null}
 
-      <div className="relative">
-        <input
-          id={inputId}
-          aria-invalid={error ? true : undefined}
-          className={`${INPUT} ${error ? 'border-danger-600' : ''} ${addon ? 'pr-16' : ''} ${className}`.trim()}
-          {...rest}
-        />
-        {addon && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-text-muted">
-            {addon}
-          </span>
+      <input
+        id={inputId}
+        className={cn(
+          CONTROL_BASE,
+          invalid ? CONTROL_BORDER_ERROR : CONTROL_BORDER_DEFAULT,
+          CONTROL_DISABLED,
+          CONTROL_FOCUS,
+          className,
         )}
-      </div>
+        aria-invalid={invalid || undefined}
+        aria-describedby={message ? messageId : undefined}
+        {...props}
+      />
 
-      {error ? (
-        <p className="mt-1.5 text-caption text-danger-600">{error}</p>
-      ) : hint ? (
-        <p className="mt-1.5 text-caption text-text-muted">{hint}</p>
+      {message ? (
+        <p id={messageId} className={cn('text-caption', invalid ? 'text-danger-600' : 'text-text-secondary')}>
+          {message}
+        </p>
       ) : null}
     </div>
   );

@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { BrowserRouter, HashRouter, Route, Routes } from 'react-router';
 
 import { CARD, PAGE_SHELL, SECTION_BLOCK, text } from '@/design/tokens';
 import DesignPreviewPage from '@/pages/DesignPreviewPage';
@@ -32,6 +32,11 @@ function HomePage() {
   );
 }
 
+// `npm run build:show` 产出单文件后是双击（file://）打开的：此时
+// location.pathname 是磁盘路径（如 /Users/.../index.html），BrowserRouter
+// 匹配不到任何路由 → 白屏。file:// 下退回 HashRouter，其余场景保持 BrowserRouter。
+const Router = window.location.protocol === 'file:' ? HashRouter : BrowserRouter;
+
 /**
  * 路由表。
  *
@@ -42,11 +47,11 @@ function HomePage() {
  */
 export default function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/design" element={<DesignPreviewPage />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
